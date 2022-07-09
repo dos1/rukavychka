@@ -87,5 +87,9 @@ struct CommonResources* CreateGameData(struct Game* game) {
 }
 
 void DestroyGameData(struct Game* game) {
+	al_destroy_bitmap(game->data->tex);
+	al_destroy_sample_instance(game->data->sample_instance);
+	al_destroy_sample(game->data->sample);
+	DestroyShader(game, game->data->shader);
 	free(game->data);
 }

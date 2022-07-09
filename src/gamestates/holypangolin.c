@@ -51,9 +51,12 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	al_set_shader_sampler("tex", data->bg, 1);
 	al_set_shader_float_vector("offset", 2, offset, 1);
 	al_set_shader_float_vector("size", 2, size, 1);
+	al_set_shader_float("scale", 1.0);
+	al_set_shader_bool("flipX", false);
+	al_set_shader_bool("flipY", false);
 
 	double pos = sin(data->counter / (15 * 6));
-	al_draw_tinted_scaled_bitmap(data->bmp, al_map_rgba_f(pos, pos, pos, pos), 0, 0, al_get_bitmap_width(data->bmp), al_get_bitmap_height(data->bmp), game->viewport.width * 0.165, game->viewport.height * 0.165, game->viewport.width * 0.66, game->viewport.height * 0.66, 0);
+	al_draw_tinted_scaled_bitmap(data->bmp, al_map_rgba_f(pos, pos, pos, pos), 0, 0, al_get_bitmap_width(data->bmp), al_get_bitmap_height(data->bmp), game->viewport.width * 0.165 + (game->viewport.width - (game->viewport.height * 0.66)) / 4.0, game->viewport.height * 0.165, game->viewport.height * 0.66, game->viewport.height * 0.66, 0);
 
 	al_use_shader(NULL);
 	//	al_draw_filled_rectangle(0, 0, game->viewport.width, game->viewport.height, al_map_rgba_f(1 - pos / 280.0, 1 - pos / 280.0, 1 - pos / 280.0, 1 - pos / 280.0));
@@ -84,6 +87,8 @@ void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
 
 void Gamestate_Unload(struct Game* game, struct GamestateResources* data) {
 	al_destroy_bitmap(data->bmp);
+	al_destroy_bitmap(data->bg);
+	DestroyShader(game, data->shader);
 	al_destroy_audio_stream(data->monkeys);
 	free(data);
 }

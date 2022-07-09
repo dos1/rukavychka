@@ -25,6 +25,8 @@ struct GamestateResources {
 	ALLEGRO_FONT* font;
 	ALLEGRO_BITMAP* bg;
 	ALLEGRO_SHADER* shader;
+	double value;
+	bool valup, valdown;
 	int blink_counter;
 
 	ALLEGRO_BITMAP* player;
@@ -37,9 +39,11 @@ struct GamestateResources {
 	bool show1, shown1;
 	bool show2, shown2;
 	ALLEGRO_AUDIO_STREAM *player1, *player2, *obj;
+
+	struct Character *lisek, *smok;
 };
 
-int Gamestate_ProgressCount = 1;
+int Gamestate_ProgressCount = 5;
 
 void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double delta) {
 	data->blink_counter++;
@@ -47,15 +51,41 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 		data->blink_counter = 0;
 	}
 
-	if (data->w) data->y -= delta / 3.0;
-	if (data->s) data->y += delta / 3.0;
-	if (data->a) data->x -= delta / 3.0;
-	if (data->d) data->x += delta / 3.0;
+	SwitchSpritesheet(game, data->lisek, "idle");
+	data->lisek->flipY = false;
+	if (data->w) {
+		data->y -= delta / 3.0;
+		SwitchSpritesheet(game, data->lisek, "walk2");
+		data->lisek->flipY = false;
+	}
+	if (data->s) {
+		data->y += delta / 3.0;
+		SwitchSpritesheet(game, data->lisek, "walk2");
+		data->lisek->flipY = true;
+	}
+	if (data->a) {
+		data->x -= delta / 3.0;
+		SwitchSpritesheet(game, data->lisek, "walk");
+		data->lisek->flipX = false;
+		data->lisek->flipY = false;
+	}
+	if (data->d) {
+		data->x += delta / 3.0;
+		SwitchSpritesheet(game, data->lisek, "walk");
+		data->lisek->flipX = true;
+		data->lisek->flipY = false;
+	}
 
-	if (data->w2) data->y2 -= delta / 3.0;
-	if (data->s2) data->y2 += delta / 3.0;
-	if (data->a2) data->x2 -= delta / 3.0;
-	if (data->d2) data->x2 += delta / 3.0;
+	if (data->w2) { data->y2 -= delta / 3.0; }
+	if (data->s2) { data->y2 += delta / 3.0; }
+	if (data->a2) {
+		data->x2 -= delta / 3.0;
+		data->smok->flipX = false;
+	}
+	if (data->d2) {
+		data->x2 += delta / 3.0;
+		data->smok->flipX = true;
+	}
 
 	if (data->show1 && !data->shown1) {
 		data->shown1 = true;
@@ -67,26 +97,51 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 		al_rewind_audio_stream(data->player2);
 		al_set_audio_stream_playing(data->player2, true);
 	}
+
+	AnimateCharacter(game, data->lisek, delta, 1.0);
+	AnimateCharacter(game, data->smok, delta, 1.0);
+
+	if (data->valup) data->value += delta * 0.1;
+	if (data->valdown) data->value -= delta * 0.1;
+	PrintConsole(game, "%f", data->value);
 }
 
 void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	float size[2] = {al_get_bitmap_width(data->bg), al_get_bitmap_height(data->bg)};
-	float offset[2] = {-1920 * data->x + sin(al_get_time() / 2.0) * 4, -1080 * data->y + cos(al_get_time() / 2.9) * 3};
-	float offset2[2] = {-1920 * data->x2 + sin(al_get_time() / 2.0) * 4, -1080 * data->y2 + cos(al_get_time() / 2.9) * 3};
+	float offset[2] = {
+		-1920 * ((data->lisek->flipX ? 1.0 : 0.0) + data->x * (data->lisek->flipX ? -1.0 : 1.0)) + sin(al_get_time() / 2.0) * (data->lisek->flipX ? -4 : 4) + al_get_bitmap_width(data->lisek->frame->bitmap) * data->lisek->scaleX / 2.0,
+		-1080 * ((data->lisek->flipY ? 1.0 : 0.0) + data->y * (data->lisek->flipY ? -1.0 : 1.0)) + cos(al_get_time() / 2.9) * (data->lisek->flipY ? -3 : 3) + al_get_bitmap_height(data->lisek->frame->bitmap) * data->lisek->scaleY / 2.0};
+	float offset2[2] = {
+		-1920 * ((data->smok->flipX ? 1.0 : 0.0) + data->x2 * (data->smok->flipX ? -1.0 : 1.0)) + sin(al_get_time() / 2.0) * (data->smok->flipX ? -4 : 4) + al_get_bitmap_width(data->smok->frame->bitmap) * data->smok->scaleX / 2.0,
+		-1080 * ((data->smok->flipY ? 1.0 : 0.0) + data->y2 * (data->smok->flipY ? -1.0 : 1.0)) + cos(al_get_time() / 2.9) * (data->smok->flipY ? -3 : 3) + al_get_bitmap_height(data->smok->frame->bitmap) * data->smok->scaleY / 2.0};
 	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
 
 	al_use_shader(data->shader);
 	al_set_shader_sampler("tex", data->bg, 1);
 	al_set_shader_float_vector("size", 2, size, 1);
 	al_set_shader_float_vector("offset", 2, offset, 1);
+	al_set_shader_float("scale", data->lisek->scaleX);
+	al_set_shader_bool("flipX", data->lisek->flipX);
+	al_set_shader_bool("flipY", data->lisek->flipY);
 
+	SetCharacterPosition(game, data->lisek, 1920 * data->x, 1080 * data->y, 0);
+	data->lisek->scaleX = 0.2;
+	data->lisek->scaleY = 0.2;
 	if (data->shown1) {
-		al_draw_bitmap(data->player, 1920 * data->x, 1080 * data->y, 0);
+		DrawCharacter(game, data->lisek);
+		// al_draw_bitmap(data->player, 1920 * data->x, 1080 * data->y, 0);
 	}
 
 	al_set_shader_float_vector("offset", 2, offset2, 1);
+	al_set_shader_bool("flipX", data->smok->flipX);
+	al_set_shader_bool("flipY", data->smok->flipY);
+	al_set_shader_float("scale", data->smok->scaleX);
+	SetCharacterPosition(game, data->smok, 1920 * data->x2, 1080 * data->y2, 0);
+	data->smok->scaleX = 0.2;
+	data->smok->scaleY = 0.2;
 	if (data->shown2) {
-		al_draw_bitmap(data->player, 1920 * data->x2, 1080 * data->y2, 0);
+		DrawCharacter(game, data->smok);
+		// al_draw_bitmap(data->player, 1920 * data->x2, 1080 * data->y2, 0);
 	}
 
 	al_use_shader(NULL);
@@ -168,6 +223,19 @@ void Gamestate_ProcessEvent(struct Game* game, struct GamestateResources* data, 
 		data->d2 = false;
 		data->show2 = true;
 	}
+
+	if ((ev->type == ALLEGRO_EVENT_KEY_DOWN) && (ev->keyboard.keycode == ALLEGRO_KEY_1)) {
+		data->valdown = true;
+	}
+	if ((ev->type == ALLEGRO_EVENT_KEY_UP) && (ev->keyboard.keycode == ALLEGRO_KEY_1)) {
+		data->valdown = false;
+	}
+	if ((ev->type == ALLEGRO_EVENT_KEY_DOWN) && (ev->keyboard.keycode == ALLEGRO_KEY_2)) {
+		data->valup = true;
+	}
+	if ((ev->type == ALLEGRO_EVENT_KEY_UP) && (ev->keyboard.keycode == ALLEGRO_KEY_2)) {
+		data->valup = false;
+	}
 }
 
 void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
@@ -201,11 +269,29 @@ void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
 	al_set_audio_stream_gain(data->obj, 1.5);
 	al_set_audio_stream_playmode(data->obj, ALLEGRO_PLAYMODE_ONCE);
 
+	data->lisek = CreateCharacter(game, "lisek");
+	RegisterSpritesheet(game, data->lisek, "walk");
+	RegisterSpritesheet(game, data->lisek, "walk2");
+	RegisterSpritesheet(game, data->lisek, "idle");
+	LoadSpritesheets(game, data->lisek, progress);
+
+	data->smok = CreateCharacter(game, "smok");
+	RegisterSpritesheet(game, data->smok, "smok");
+	LoadSpritesheets(game, data->smok, progress);
+
 	return data;
 }
 
 void Gamestate_Unload(struct Game* game, struct GamestateResources* data) {
 	al_destroy_font(data->font);
+	al_destroy_bitmap(data->bg);
+	al_destroy_bitmap(data->player);
+	DestroyShader(game, data->shader);
+	al_destroy_audio_stream(data->player1);
+	al_destroy_audio_stream(data->player2);
+	al_destroy_audio_stream(data->obj);
+	DestroyCharacter(game, data->lisek);
+	DestroyCharacter(game, data->smok);
 	free(data);
 }
 
