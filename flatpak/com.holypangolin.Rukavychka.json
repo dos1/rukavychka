@@ -1,5 +1,5 @@
 {
-"app-id": "com.holypangolin.Rukavychka.json",
+"app-id": "com.holypangolin.Rukavychka",
 "runtime": "org.freedesktop.Platform",
 "runtime-version": "19.08",
 "sdk": "org.freedesktop.Sdk",
