@@ -25,9 +25,6 @@ struct GamestateResources {
 	ALLEGRO_FONT* font;
 	ALLEGRO_BITMAP* bg;
 	ALLEGRO_SHADER* shader;
-	double value;
-	bool valup, valdown;
-	int blink_counter;
 
 	ALLEGRO_BITMAP* player;
 
@@ -46,11 +43,6 @@ struct GamestateResources {
 int Gamestate_ProgressCount = 5;
 
 void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double delta) {
-	data->blink_counter++;
-	if (data->blink_counter >= 60) {
-		data->blink_counter = 0;
-	}
-
 	SwitchSpritesheet(game, data->lisek, "idle");
 	data->lisek->flipY = false;
 	if (data->w) {
@@ -100,10 +92,6 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 
 	AnimateCharacter(game, data->lisek, delta, 1.0);
 	AnimateCharacter(game, data->smok, delta, 1.0);
-
-	if (data->valup) data->value += delta * 0.1;
-	if (data->valdown) data->value -= delta * 0.1;
-	PrintConsole(game, "%f", data->value);
 }
 
 void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
@@ -145,11 +133,6 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	}
 
 	al_use_shader(NULL);
-
-	if (data->blink_counter < 50) {
-		//	al_draw_text(data->font, al_map_rgb(0, 0, 0), game->viewport.width / 2.0, game->viewport.height / 2.0,
-		//	ALLEGRO_ALIGN_CENTRE, "Nothing to see here, move along!");
-	}
 }
 
 void Gamestate_ProcessEvent(struct Game* game, struct GamestateResources* data, ALLEGRO_EVENT* ev) {
@@ -223,19 +206,6 @@ void Gamestate_ProcessEvent(struct Game* game, struct GamestateResources* data, 
 		data->d2 = false;
 		data->show2 = true;
 	}
-
-	if ((ev->type == ALLEGRO_EVENT_KEY_DOWN) && (ev->keyboard.keycode == ALLEGRO_KEY_1)) {
-		data->valdown = true;
-	}
-	if ((ev->type == ALLEGRO_EVENT_KEY_UP) && (ev->keyboard.keycode == ALLEGRO_KEY_1)) {
-		data->valdown = false;
-	}
-	if ((ev->type == ALLEGRO_EVENT_KEY_DOWN) && (ev->keyboard.keycode == ALLEGRO_KEY_2)) {
-		data->valup = true;
-	}
-	if ((ev->type == ALLEGRO_EVENT_KEY_UP) && (ev->keyboard.keycode == ALLEGRO_KEY_2)) {
-		data->valup = false;
-	}
 }
 
 void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
@@ -296,7 +266,6 @@ void Gamestate_Unload(struct Game* game, struct GamestateResources* data) {
 }
 
 void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
-	data->blink_counter = 0;
 	data->x = 0.2;
 	data->y = 0.55;
 	data->x2 = 0.65;
