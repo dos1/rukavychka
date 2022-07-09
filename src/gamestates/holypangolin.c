@@ -92,6 +92,8 @@ void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 	data->counter = 0;
 	al_rewind_audio_stream(data->monkeys);
 	// al_set_audio_stream_playing(data->monkeys, true);
+
+	al_play_sample_instance(game->data->sample_instance);
 }
 
 void Gamestate_Stop(struct Game* game, struct GamestateResources* data) {

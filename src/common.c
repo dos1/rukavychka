@@ -24,7 +24,7 @@
 void Compositor(struct Game* game) {
 	struct Gamestate* tmp = GetNextGamestate(game, NULL);
 
-	if (al_get_time() - game->data->lasttime > 0.3) {
+	if (al_get_time() - game->data->lasttime > 0.4) {
 		game->data->posx = rand() / (float)RAND_MAX * 880;
 		game->data->posy = rand() / (float)RAND_MAX * 1200;
 		game->data->lasttime = al_get_time();
@@ -32,7 +32,7 @@ void Compositor(struct Game* game) {
 
 	ClearToColor(game, al_map_rgb(255, 255, 255));
 
-	ALLEGRO_COLOR tint = al_map_rgba_f(0.95, 0.95, 0.95, 0.95);
+	ALLEGRO_COLOR tint = al_map_rgba_f(1.0, 1.0, 1.0, 1.0);
 
 	if (game->loading.shown) {
 		al_draw_tinted_bitmap(GetGamestateFramebuffer(game, GetGamestate(game, NULL)), tint, game->clip_rect.x, game->clip_rect.y, 0);
@@ -68,10 +68,21 @@ bool GlobalEventHandler(struct Game* game, ALLEGRO_EVENT* ev) {
 	return false;
 }
 
+void PreLogic(struct Game* game, double delta) {
+	al_set_sample_instance_gain(game->data->sample_instance, fmin(0.32, al_get_sample_instance_gain(game->data->sample_instance) + delta / 8.0));
+}
+
 struct CommonResources* CreateGameData(struct Game* game) {
 	struct CommonResources* data = calloc(1, sizeof(struct CommonResources));
 	data->tex = al_load_bitmap(GetDataFilePath(game, "tex.jpg"));
 	data->shader = CreateShader(game, GetDataFilePath(game, "shaders/vertex.glsl"), GetDataFilePath(game, "shaders/alpha.glsl"));
+
+	data->sample = al_load_sample(GetDataFilePath(game, "synth.flac"));
+	data->sample_instance = al_create_sample_instance(data->sample);
+	al_attach_sample_instance_to_mixer(data->sample_instance, game->audio.music);
+	al_set_sample_instance_playmode(data->sample_instance, ALLEGRO_PLAYMODE_LOOP);
+	al_set_sample_instance_gain(data->sample_instance, 0.0);
+
 	return data;
 }
 

@@ -45,6 +45,7 @@ int main(int argc, char** argv) {
 				.event = GlobalEventHandler,
 				.destroy = DestroyGameData,
 				.compositor = Compositor,
+				.prelogic = PreLogic,
 			},
 		});
 	if (!game) { return 1; }
