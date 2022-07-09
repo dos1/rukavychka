@@ -23,6 +23,8 @@
 
 struct GamestateResources {
 	ALLEGRO_FONT* font;
+	ALLEGRO_BITMAP* bg;
+	ALLEGRO_SHADER* shader;
 	int blink_counter;
 };
 
@@ -36,8 +38,17 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 }
 
 void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
+	float coord_limit[2] = {al_get_bitmap_width(data->bg), al_get_bitmap_height(data->bg)};
+	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+
+	al_use_shader(data->shader);
+	al_set_shader_sampler("tex", data->bg, 1);
+	al_set_shader_float_vector("size", 2, coord_limit, 1);
+
+	al_use_shader(NULL);
+
 	if (data->blink_counter < 50) {
-		al_draw_text(data->font, al_map_rgb(255, 255, 255), game->viewport.width / 2.0, game->viewport.height / 2.0,
+		al_draw_text(data->font, al_map_rgb(0, 0, 0), game->viewport.width / 2.0, game->viewport.height / 2.0,
 			ALLEGRO_ALIGN_CENTRE, "Nothing to see here, move along!");
 	}
 }
@@ -56,6 +67,10 @@ void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
 	data->font = al_create_builtin_font();
 	progress(game); // report that we progressed with the loading, so the engine can move a progress bar
 	al_set_new_bitmap_flags(flags);
+
+	data->bg = al_load_bitmap(GetDataFilePath(game, "bg.jpg"));
+	data->shader = CreateShader(game, GetDataFilePath(game, "shaders/vertex.glsl"), GetDataFilePath(game, "shaders/combine.glsl"));
+
 	return data;
 }
 

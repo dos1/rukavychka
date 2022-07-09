@@ -39,17 +39,21 @@ int main(int argc, char** argv) {
 
 	struct Game* game = libsuperderpy_init(argc, argv, LIBSUPERDERPY_GAMENAME,
 		(struct Params){
-			320,
-			180,
+			1920,
+			1080,
 			.handlers = {
 				.event = GlobalEventHandler,
 				.destroy = DestroyGameData,
+				.compositor = Compositor,
 			},
 		});
 	if (!game) { return 1; }
 
-	LoadGamestate(game, "dosowisko");
-	StartGamestate(game, "dosowisko");
+	SetBackgroundColor(game, al_map_rgb(255, 255, 255));
+	libsuperderpy_mainloop(game);
+
+	LoadGamestate(game, "holypangolin");
+	StartGamestate(game, "holypangolin");
 
 	game->data = CreateGameData(game);
 

@@ -20,9 +20,13 @@
 
 struct CommonResources {
 	// Fill in with common data accessible from all gamestates.
-	bool unused;
+	ALLEGRO_BITMAP* tex;
+	ALLEGRO_SHADER* shader;
+	double lasttime;
+	int posx, posy;
 };
 
+void Compositor(struct Game* game);
 struct CommonResources* CreateGameData(struct Game* game);
 void DestroyGameData(struct Game* game);
 bool GlobalEventHandler(struct Game* game, ALLEGRO_EVENT* ev);
