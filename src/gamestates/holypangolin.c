@@ -68,7 +68,7 @@ void Gamestate_ProcessEvent(struct Game* game, struct GamestateResources* data, 
 
 void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
 	struct GamestateResources* data = malloc(sizeof(struct GamestateResources));
-	data->bmp = al_load_bitmap(GetDataFilePath(game, "holypangolin.webp"));
+	data->bmp = al_load_bitmap(GetDataFilePath(game, "holypangolin.png"));
 	progress(game); // report that we progressed with the loading, so the engine can draw a progress bar
 
 	data->monkeys = al_load_audio_stream(GetDataFilePath(game, "holypangolin.flac"), 4, 2048);
