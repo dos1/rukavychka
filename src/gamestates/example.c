@@ -28,7 +28,7 @@ struct GamestateResources {
 
 	ALLEGRO_BITMAP* player;
 
-	ALLEGRO_BITMAP *bg_anim, *bg_anim2;
+	ALLEGRO_BITMAP *bg_anim, *bg_anim2, *mask1, *mask2, *p1, *p2, *koniec;
 
 	bool w, s, a, d;
 	double x, y;
@@ -64,12 +64,18 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 	if (data->a) {
 		data->x -= delta / 3.0;
 		SwitchSpritesheet(game, data->lisek, "walk");
+		if (data->lisek->flipX) {
+			data->x += 0.12;
+		}
 		data->lisek->flipX = false;
 		data->lisek->flipY = false;
 	}
 	if (data->d) {
 		data->x += delta / 3.0;
 		SwitchSpritesheet(game, data->lisek, "walk");
+		if (!data->lisek->flipX) {
+			data->x -= 0.12;
+		}
 		data->lisek->flipX = true;
 		data->lisek->flipY = false;
 	}
@@ -78,10 +84,16 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 	if (data->s2) { data->y2 += delta / 3.0; }
 	if (data->a2) {
 		data->x2 -= delta / 3.0;
+		if (data->smok->flipX) {
+			data->x2 += 0.02;
+		}
 		data->smok->flipX = false;
 	}
 	if (data->d2) {
 		data->x2 += delta / 3.0;
+		if (!data->smok->flipX) {
+			data->x2 -= 0.02;
+		}
 		data->smok->flipX = true;
 	}
 
@@ -107,29 +119,46 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 	int lx = GetCharacterX(game, data->lisek), ly = GetCharacterY(game, data->lisek);
 	int sx = GetCharacterX(game, data->smok), sy = GetCharacterY(game, data->smok);
 
-	if (lx > 1300 && lx < 1920 && ly > 140 && ly < 280) {
-		if (sx > 200 && sx < 550 && sy > 840 && sy < 1000) {
-			if (!data->found) {
-				al_rewind_audio_stream(data->obj);
-				al_set_audio_stream_playing(data->obj, true);
-				data->found = true;
-			}
+	ALLEGRO_COLOR color1 = al_get_pixel(data->p1, GetCharacterX(game, data->drzwi), GetCharacterY(game, data->drzwi));
+	ALLEGRO_COLOR color2 = al_get_pixel(data->p2, GetCharacterX(game, data->myszka), GetCharacterY(game, data->myszka));
+
+	if (color1.a && color2.a) {
+		if (!data->found) {
+			al_rewind_audio_stream(data->obj);
+			al_set_audio_stream_playing(data->obj, true);
+			data->found = true;
 		}
 	}
 }
 
 void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	al_set_target_bitmap(data->bg_anim);
+	al_clear_to_color(al_map_rgba(255, 255, 255, 255));
 	al_draw_bitmap(data->bg, 0, 0, 0);
-	if (!data->found)
-		DrawCharacter(game, data->myszka);
-	al_draw_filled_rectangle(0, 0, 1920, 1080, al_map_rgba(0, 0, 0, 32));
+	// if (!data->found)
+	//	DrawCharacter(game, data->drzwi);
+	al_draw_filled_rectangle(0, 0, 1920, 1080, al_map_rgba(0, 0, 0, 20));
 	al_set_target_bitmap(data->bg_anim2);
+	al_clear_to_color(al_map_rgba(255, 255, 255, 255));
 	al_draw_bitmap(data->bg2, 0, 0, 0);
 	if (!data->found)
-		DrawCharacter(game, data->drzwi);
-	al_draw_filled_rectangle(0, 0, 1920, 1080, al_map_rgba(0, 0, 0, 32));
+		DrawCharacter(game, data->myszka);
+	al_draw_filled_rectangle(0, 0, 1920, 1080, al_map_rgba(0, 0, 0, 20));
+
+	al_set_target_bitmap(data->p1);
+	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+	if (data->shown1) {
+		DrawCharacter(game, data->lisek);
+	}
+	al_set_target_bitmap(data->p2);
+	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+	if (data->shown2) {
+		DrawCharacter(game, data->smok);
+		// al_draw_bitmap(data->player, 1920 * data->x2, 1080 * data->y2, 0);
+	}
+
 	SetFramebufferAsTarget(game);
+	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
 
 	float size[2] = {al_get_bitmap_width(data->bg), al_get_bitmap_height(data->bg)};
 	float offset[2] = {
@@ -138,8 +167,6 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	float offset2[2] = {
 		-1920 * ((data->smok->flipX ? 1.0 : 0.0) + data->x2 * (data->smok->flipX ? -1.0 : 1.0)) + sin(al_get_time() / 2.0) * (data->smok->flipX ? -4 : 4) + al_get_bitmap_width(data->smok->frame->bitmap) * data->smok->scaleX / 2.0,
 		-1080 * ((data->smok->flipY ? 1.0 : 0.0) + data->y2 * (data->smok->flipY ? -1.0 : 1.0)) + cos(al_get_time() / 2.9) * (data->smok->flipY ? -3 : 3) + al_get_bitmap_height(data->smok->frame->bitmap) * data->smok->scaleY / 2.0};
-
-	al_clear_to_color(al_map_rgba(255, 255, 255, 255));
 
 	al_use_shader(data->shader);
 	al_set_shader_sampler("tex", data->bg_anim, 1);
@@ -150,6 +177,7 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	al_set_shader_bool("flipY", data->lisek->flipY);
 
 	SetCharacterPosition(game, data->lisek, 1920 * data->x, 1080 * data->y, 0);
+
 	if (data->shown1) {
 		DrawCharacter(game, data->lisek);
 		// al_draw_bitmap(data->player, 1920 * data->x, 1080 * data->y, 0);
@@ -169,7 +197,94 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	al_use_shader(NULL);
 	if (data->found) {
 		DrawCharacter(game, data->myszka);
-		DrawCharacter(game, data->drzwi);
+		// DrawCharacter(game, data->drzwi);
+	}
+
+	if (data->found) {
+		int mx = GetCharacterX(game, data->myszka);
+		int my = GetCharacterY(game, data->myszka);
+		int lx = GetCharacterX(game, data->lisek) + (data->lisek->flipX ? 420 : 230);
+		int ly = GetCharacterY(game, data->lisek) - 50;
+		int sx = GetCharacterX(game, data->smok) + 45 * (data->smok->flipX ? 1 : -1);
+		int sy = GetCharacterY(game, data->smok) + 50;
+
+		ALLEGRO_COLOR color1 = al_get_pixel(data->p1, mx, my);
+		ALLEGRO_COLOR color2 = al_get_pixel(data->p2, mx, my);
+
+		if (color1.a) {
+			bool connected = true;
+
+			double a = my - ly;
+			double b = lx - mx;
+			double c = a * lx + b * ly;
+
+			if (mx != lx) {
+				for (int x = fmin(mx, lx); x <= fmax(mx, lx); x++) {
+					int y = c / b - a / b * x;
+
+					ALLEGRO_COLOR mask1 = al_get_pixel(data->mask1, x, y);
+					if (!mask1.a) {
+						connected = false;
+						break;
+					}
+					// al_draw_line(mx, my, x, y, al_map_rgb(0, 0, 0), 1);
+				}
+			}
+
+			if (mx == lx) {
+				for (int y = fmin(my, ly); y <= fmax(my, ly); y++) {
+					ALLEGRO_COLOR mask1 = al_get_pixel(data->mask1, mx, y);
+					if (!mask1.a) {
+						connected = false;
+						break;
+					}
+					// al_draw_line(mx, my, mx, y, al_map_rgb(0, 0, 0), 1);
+				}
+			}
+
+			if (connected)
+				SetCharacterPosition(game, data->myszka, lx, ly, 0);
+		}
+
+		if (color2.a) {
+			bool connected = true;
+
+			double a = my - sy;
+			double b = sx - mx;
+			double c = a * sx + b * sy;
+
+			if (mx != sx) {
+				for (int x = fmin(mx, sx); x <= fmax(mx, sx); x++) {
+					int y = c / b - a / b * x;
+
+					ALLEGRO_COLOR mask2 = al_get_pixel(data->mask2, x, y);
+					if (!mask2.a) {
+						connected = false;
+						break;
+					}
+					// al_draw_line(mx, my, x, y, al_map_rgb(0, 0, 0), 1);
+				}
+			}
+
+			if (mx == sx) {
+				for (int y = fmin(my, sy); y <= fmax(my, sy); y++) {
+					ALLEGRO_COLOR mask2 = al_get_pixel(data->mask2, mx, y);
+					if (!mask2.a) {
+						connected = false;
+						break;
+					}
+					// al_draw_line(mx, my, mx, y, al_map_rgb(0, 0, 0), 1);
+				}
+			}
+
+			if (connected)
+				SetCharacterPosition(game, data->myszka, sx, sy, 0);
+		}
+
+		if (GetCharacterX(game, data->myszka) <= 0) SetCharacterPosition(game, data->myszka, 1, GetCharacterY(game, data->myszka), 0);
+		if (GetCharacterY(game, data->myszka) <= 0) SetCharacterPosition(game, data->myszka, GetCharacterX(game, data->myszka), 1, 0);
+		if (GetCharacterX(game, data->myszka) >= 1920) SetCharacterPosition(game, data->myszka, 1919, GetCharacterY(game, data->myszka), 0);
+		if (GetCharacterY(game, data->myszka) >= 1080) SetCharacterPosition(game, data->myszka, GetCharacterX(game, data->myszka), 1079, 0);
 	}
 }
 
@@ -244,6 +359,12 @@ void Gamestate_ProcessEvent(struct Game* game, struct GamestateResources* data, 
 		data->d2 = false;
 		data->show2 = true;
 	}
+
+	if ((ev->type == ALLEGRO_EVENT_KEY_DOWN) && (ev->keyboard.keycode == ALLEGRO_KEY_SPACE)) {
+		al_rewind_audio_stream(data->obj);
+		al_set_audio_stream_playing(data->obj, true);
+		data->found = true;
+	}
 }
 
 void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
@@ -254,9 +375,14 @@ void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
 	progress(game); // report that we progressed with the loading, so the engine can move a progress bar
 	al_set_new_bitmap_flags(flags);
 
-	data->bg = al_load_bitmap(GetDataFilePath(game, "tlo1.png"));
-	data->bg2 = al_load_bitmap(GetDataFilePath(game, "tlo2a.png"));
+	data->mask1 = al_load_bitmap(GetDataFilePath(game, "plansze/maska_1_nowa.png"));
+	data->mask2 = al_load_bitmap(GetDataFilePath(game, "plansze/maska_2_nowa.png"));
+
+	data->bg = al_load_bitmap(GetDataFilePath(game, "plansze/nowsze/tlo1a_z_drzwiami.png"));
+	data->bg2 = al_load_bitmap(GetDataFilePath(game, "plansze/nowsze/tlo2a_bez_drzwi.png"));
 	data->shader = CreateShader(game, GetDataFilePath(game, "shaders/vertex.glsl"), GetDataFilePath(game, "shaders/combine.glsl"));
+
+	data->koniec = al_load_bitmap(GetDataFilePath(game, "ekran_koncowy_nowy.png"));
 
 	data->player = al_load_bitmap(GetDataFilePath(game, "player.png"));
 
@@ -298,6 +424,9 @@ void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
 
 	data->bg_anim = CreateNotPreservedBitmap(al_get_bitmap_width(data->bg), al_get_bitmap_height(data->bg));
 	data->bg_anim2 = CreateNotPreservedBitmap(al_get_bitmap_width(data->bg2), al_get_bitmap_height(data->bg2));
+
+	data->p1 = CreateNotPreservedBitmap(game->viewport.width, game->viewport.height);
+	data->p2 = CreateNotPreservedBitmap(game->viewport.width, game->viewport.height);
 	return data;
 }
 
@@ -308,6 +437,11 @@ void Gamestate_Unload(struct Game* game, struct GamestateResources* data) {
 	al_destroy_bitmap(data->bg_anim);
 	al_destroy_bitmap(data->bg_anim2);
 	al_destroy_bitmap(data->player);
+	al_destroy_bitmap(data->mask1);
+	al_destroy_bitmap(data->mask2);
+	al_destroy_bitmap(data->p1);
+	al_destroy_bitmap(data->p2);
+	al_destroy_bitmap(data->koniec);
 	DestroyShader(game, data->shader);
 	al_destroy_audio_stream(data->player1);
 	al_destroy_audio_stream(data->player2);
@@ -325,7 +459,7 @@ void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 	data->x2 = 0.65;
 	data->y2 = 0.55;
 	data->lisek->flipX = true;
-	SetCharacterPosition(game, data->myszka, 1920 * 0.9, 1080 * 0.15, 0.0);
+	SetCharacterPosition(game, data->myszka, 360, 100, 0.0);
 	data->myszka->scaleX = 0.15;
 	data->myszka->scaleY = 0.15;
 	data->drzwi->scaleX = 0.15;
@@ -334,7 +468,7 @@ void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 	data->lisek->scaleY = 0.32;
 	data->smok->scaleX = 0.3;
 	data->smok->scaleY = 0.3;
-	SetCharacterPosition(game, data->drzwi, 1920 * 0.2, 1080 * 0.9, 0.0);
+	SetCharacterPosition(game, data->drzwi, 1100, 750, 0.0);
 }
 
 void Gamestate_Stop(struct Game* game, struct GamestateResources* data) {}
