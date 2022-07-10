@@ -26,6 +26,7 @@ struct CommonResources {
 	ALLEGRO_SAMPLE* sample;
 	double lasttime;
 	int posx, posy;
+	bool won;
 };
 
 void Compositor(struct Game* game);

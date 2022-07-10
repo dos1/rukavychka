@@ -47,12 +47,13 @@ int main(int argc, char** argv) {
 				.compositor = Compositor,
 				.prelogic = PreLogic,
 			},
-		});
+			.show_loading_on_launch = true});
 	if (!game) { return 1; }
 
 	SetBackgroundColor(game, al_map_rgb(255, 255, 255));
 
 	LoadGamestate(game, "holypangolin");
+	LoadGamestate(game, "example");
 	StartGamestate(game, "holypangolin");
 
 	game->data = CreateGameData(game);

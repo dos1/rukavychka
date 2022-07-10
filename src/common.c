@@ -54,6 +54,12 @@ void Compositor(struct Game* game) {
 		al_get_bitmap_height(game->data->tex) / 1080.0 * (double)game->clip_rect.h * 0.4, 0);
 	al_reset_clipping_rectangle();
 	al_use_shader(NULL);
+
+	if (game->data->won) {
+		double col = 1.0 - pow(al_get_sample_instance_gain(game->data->sample_instance) / 0.32, 0.5);
+		al_draw_filled_rectangle(game->clip_rect.x, game->clip_rect.y, game->clip_rect.w, game->clip_rect.h,
+			al_map_rgba_f(0, 0, 0, col));
+	}
 }
 
 bool GlobalEventHandler(struct Game* game, ALLEGRO_EVENT* ev) {
@@ -69,7 +75,16 @@ bool GlobalEventHandler(struct Game* game, ALLEGRO_EVENT* ev) {
 }
 
 void PreLogic(struct Game* game, double delta) {
-	al_set_sample_instance_gain(game->data->sample_instance, fmin(0.32, al_get_sample_instance_gain(game->data->sample_instance) + delta / 8.0));
+	if (game->data->won) {
+		al_set_sample_instance_gain(game->data->sample_instance, fmax(0.00, al_get_sample_instance_gain(game->data->sample_instance) - delta / 16.0));
+		if (al_get_sample_instance_gain(game->data->sample_instance) == 0.00) {
+			SetBackgroundColor(game, al_map_rgb(0, 0, 0));
+			al_rest(1.0);
+			QuitGame(game, false);
+		}
+	} else {
+		al_set_sample_instance_gain(game->data->sample_instance, fmin(0.32, al_get_sample_instance_gain(game->data->sample_instance) + delta / 8.0));
+	}
 }
 
 struct CommonResources* CreateGameData(struct Game* game) {

@@ -28,7 +28,7 @@ struct GamestateResources {
 
 	ALLEGRO_BITMAP* player;
 
-	ALLEGRO_BITMAP *bg_anim, *bg_anim2, *mask1, *mask2, *p1, *p2, *koniec;
+	ALLEGRO_BITMAP *bg_anim, *bg_anim2, *mask1, *mask2, *p1, *p2, *w1, *koniec;
 
 	bool w, s, a, d;
 	double x, y;
@@ -37,16 +37,24 @@ struct GamestateResources {
 
 	bool show1, shown1;
 	bool show2, shown2;
-	ALLEGRO_AUDIO_STREAM *player1, *player2, *obj;
+	ALLEGRO_AUDIO_STREAM *player1, *player2, *obj, *win;
+	double woncount;
 
-	struct Character *lisek, *smok, *myszka, *drzwi;
+	struct Character *lisek, *smok, *myszka, *drzwi, *transition;
 
-	bool found;
+	bool found, won;
 };
 
-int Gamestate_ProgressCount = 7;
+int Gamestate_ProgressCount = 9;
 
 void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double delta) {
+	if (data->won) {
+		data->woncount -= delta;
+		if (data->woncount < 0.0) {
+			game->data->won = true;
+		}
+	}
+
 	SwitchSpritesheet(game, data->lisek, "idle");
 	data->lisek->flipY = false;
 	if (data->w) {
@@ -112,12 +120,10 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 	AnimateCharacter(game, data->smok, delta, 1.0);
 	AnimateCharacter(game, data->myszka, delta, 1.0);
 	AnimateCharacter(game, data->drzwi, delta, 1.0);
+	AnimateCharacter(game, data->transition, delta, 1.0);
 
 	PrintConsole(game, "lisek: %f %f", GetCharacterX(game, data->lisek), GetCharacterY(game, data->lisek));
 	PrintConsole(game, "smok: %f %f", GetCharacterX(game, data->smok), GetCharacterY(game, data->smok));
-
-	int lx = GetCharacterX(game, data->lisek), ly = GetCharacterY(game, data->lisek);
-	int sx = GetCharacterX(game, data->smok), sy = GetCharacterY(game, data->smok);
 
 	ALLEGRO_COLOR color1 = al_get_pixel(data->p1, GetCharacterX(game, data->drzwi), GetCharacterY(game, data->drzwi));
 	ALLEGRO_COLOR color2 = al_get_pixel(data->p2, GetCharacterX(game, data->myszka), GetCharacterY(game, data->myszka));
@@ -127,6 +133,18 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 			al_rewind_audio_stream(data->obj);
 			al_set_audio_stream_playing(data->obj, true);
 			data->found = true;
+		}
+	}
+
+	if (IsOnCharacter(game, data->drzwi, GetCharacterX(game, data->myszka) + 60, GetCharacterY(game, data->myszka), false)) {
+		PrintConsole(game, "WON");
+		if (!data->won) {
+			al_rewind_audio_stream(data->win);
+			al_set_audio_stream_playing(data->win, true);
+			SetCharacterPosition(game, data->transition, GetCharacterX(game, data->myszka) + 60, GetCharacterY(game, data->myszka), 0);
+			SelectSpritesheet(game, data->transition, "mikro_max");
+			data->won = true;
+			data->woncount = 5.0;
 		}
 	}
 }
@@ -201,11 +219,11 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	}
 
 	if (data->found) {
-		int mx = GetCharacterX(game, data->myszka);
+		int mx = GetCharacterX(game, data->myszka) + 45;
 		int my = GetCharacterY(game, data->myszka);
-		int lx = GetCharacterX(game, data->lisek) + (data->lisek->flipX ? 420 : 230);
+		int lx = GetCharacterX(game, data->lisek) + (data->lisek->flipX ? 420 : 230) - 60;
 		int ly = GetCharacterY(game, data->lisek) - 50;
-		int sx = GetCharacterX(game, data->smok) + 45 * (data->smok->flipX ? 1 : -1);
+		int sx = GetCharacterX(game, data->smok) + 45 * (data->smok->flipX ? 1 : -1) - 50;
 		int sy = GetCharacterY(game, data->smok) + 50;
 
 		ALLEGRO_COLOR color1 = al_get_pixel(data->p1, mx, my);
@@ -242,8 +260,12 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 				}
 			}
 
-			if (connected)
-				SetCharacterPosition(game, data->myszka, lx, ly, 0);
+			if (connected) {
+				if (mx != lx) {
+					data->myszka->flipX = mx < lx;
+				}
+				SetCharacterPosition(game, data->myszka, lx - 45, ly, 0);
+			}
 		}
 
 		if (color2.a) {
@@ -277,14 +299,42 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 				}
 			}
 
-			if (connected)
-				SetCharacterPosition(game, data->myszka, sx, sy, 0);
+			if (connected) {
+				if (mx != sx) {
+					data->myszka->flipX = mx < sx;
+				}
+				SetCharacterPosition(game, data->myszka, sx - 45, sy, 0);
+			}
 		}
 
 		if (GetCharacterX(game, data->myszka) <= 0) SetCharacterPosition(game, data->myszka, 1, GetCharacterY(game, data->myszka), 0);
 		if (GetCharacterY(game, data->myszka) <= 0) SetCharacterPosition(game, data->myszka, GetCharacterX(game, data->myszka), 1, 0);
 		if (GetCharacterX(game, data->myszka) >= 1920) SetCharacterPosition(game, data->myszka, 1919, GetCharacterY(game, data->myszka), 0);
 		if (GetCharacterY(game, data->myszka) >= 1080) SetCharacterPosition(game, data->myszka, GetCharacterX(game, data->myszka), 1079, 0);
+	}
+
+	if (data->won) {
+		al_set_target_bitmap(data->w1);
+		al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+		data->transition->scaleX = data->transition->scaleY = 0.15 * (data->transition->pos + 1);
+		if (data->transition->spritesheet->frame_count == 1) {
+			data->transition->scaleX = data->transition->scaleY = 2.0;
+		}
+		DrawCharacter(game, data->transition);
+
+		SetFramebufferAsTarget(game);
+		al_use_shader(data->shader);
+		al_set_shader_sampler("tex", data->koniec, 1);
+		al_set_shader_float_vector("size", 2, size, 1);
+		al_set_shader_float("scale", 1.0);
+		float offset[2] = {
+			0, 0};
+		al_set_shader_float_vector("offset", 2, offset, 1);
+		al_set_shader_bool("flipX", false);
+		al_set_shader_bool("flipY", false);
+		al_draw_bitmap(data->w1, 0, 0, 0);
+		// DrawCharacter(game, data->transition);
+		al_use_shader(NULL);
 	}
 }
 
@@ -359,12 +409,16 @@ void Gamestate_ProcessEvent(struct Game* game, struct GamestateResources* data, 
 		data->d2 = false;
 		data->show2 = true;
 	}
-
+	/*
 	if ((ev->type == ALLEGRO_EVENT_KEY_DOWN) && (ev->keyboard.keycode == ALLEGRO_KEY_SPACE)) {
-		al_rewind_audio_stream(data->obj);
-		al_set_audio_stream_playing(data->obj, true);
-		data->found = true;
+		al_rewind_audio_stream(data->win);
+		al_set_audio_stream_playing(data->win, true);
+		SetCharacterPosition(game, data->transition, GetCharacterX(game, data->drzwi) + 60, GetCharacterY(game, data->drzwi), 0);
+		SelectSpritesheet(game, data->transition, "mikro_max");
+		data->won = true;
+		data->woncount = 5.0;
 	}
+	*/
 }
 
 void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
@@ -404,6 +458,12 @@ void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
 	al_set_audio_stream_gain(data->obj, 2.0);
 	al_set_audio_stream_playmode(data->obj, ALLEGRO_PLAYMODE_ONCE);
 
+	data->win = al_load_audio_stream(GetDataFilePath(game, "win.flac"), 4, 2048);
+	al_set_audio_stream_playing(data->win, false);
+	al_attach_audio_stream_to_mixer(data->win, game->audio.fx);
+	al_set_audio_stream_gain(data->win, 1.5);
+	al_set_audio_stream_playmode(data->win, ALLEGRO_PLAYMODE_ONCE);
+
 	data->lisek = CreateCharacter(game, "lisek");
 	RegisterSpritesheet(game, data->lisek, "walk");
 	RegisterSpritesheet(game, data->lisek, "walk2");
@@ -422,11 +482,17 @@ void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
 	RegisterSpritesheet(game, data->drzwi, "myszka");
 	LoadSpritesheets(game, data->drzwi, progress);
 
+	data->transition = CreateCharacter(game, "transition");
+	RegisterSpritesheet(game, data->transition, "mikro_max");
+	RegisterSpritesheet(game, data->transition, "still");
+	LoadSpritesheets(game, data->transition, progress);
+
 	data->bg_anim = CreateNotPreservedBitmap(al_get_bitmap_width(data->bg), al_get_bitmap_height(data->bg));
 	data->bg_anim2 = CreateNotPreservedBitmap(al_get_bitmap_width(data->bg2), al_get_bitmap_height(data->bg2));
 
 	data->p1 = CreateNotPreservedBitmap(game->viewport.width, game->viewport.height);
 	data->p2 = CreateNotPreservedBitmap(game->viewport.width, game->viewport.height);
+	data->w1 = CreateNotPreservedBitmap(game->viewport.width, game->viewport.height);
 	return data;
 }
 
@@ -441,15 +507,18 @@ void Gamestate_Unload(struct Game* game, struct GamestateResources* data) {
 	al_destroy_bitmap(data->mask2);
 	al_destroy_bitmap(data->p1);
 	al_destroy_bitmap(data->p2);
+	al_destroy_bitmap(data->w1);
 	al_destroy_bitmap(data->koniec);
 	DestroyShader(game, data->shader);
 	al_destroy_audio_stream(data->player1);
 	al_destroy_audio_stream(data->player2);
 	al_destroy_audio_stream(data->obj);
+	al_destroy_audio_stream(data->win);
 	DestroyCharacter(game, data->lisek);
 	DestroyCharacter(game, data->smok);
 	DestroyCharacter(game, data->myszka);
 	DestroyCharacter(game, data->drzwi);
+	DestroyCharacter(game, data->transition);
 	free(data);
 }
 
