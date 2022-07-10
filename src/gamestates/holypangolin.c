@@ -37,14 +37,14 @@ int Gamestate_ProgressCount = 1;
 
 void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double delta) {
 	data->counter += delta * 60;
-	if (data->counter > 60 * 5) {
+	if (data->counter > 60 * 6) {
 		SwitchCurrentGamestate(game, NEXT_GAMESTATE);
 	}
 }
 
 void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	float size[2] = {al_get_bitmap_width(data->bg), al_get_bitmap_height(data->bg)};
-	float offset[2] = {-20 * data->counter / (60.0 * 5.0), -15 * data->counter / (60.0 * 5.0)};
+	float offset[2] = {-20 * data->counter / (60.0 * 6.0), -15 * data->counter / (60.0 * 6.0)};
 
 	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
 	al_use_shader(data->shader);
@@ -55,7 +55,7 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	al_set_shader_bool("flipX", false);
 	al_set_shader_bool("flipY", false);
 
-	double pos = sin(data->counter / (15 * 6));
+	double pos = pow(sin(data->counter / (15 * 7.5)), 0.9);
 	al_draw_tinted_scaled_bitmap(data->bmp, al_map_rgba_f(pos, pos, pos, pos), 0, 0, al_get_bitmap_width(data->bmp), al_get_bitmap_height(data->bmp), game->viewport.width * 0.165 + (game->viewport.width - (game->viewport.height * 0.66)) / 4.0, game->viewport.height * 0.165, game->viewport.height * 0.66, game->viewport.height * 0.66, 0);
 
 	al_use_shader(NULL);

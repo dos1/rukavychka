@@ -51,7 +51,6 @@ int main(int argc, char** argv) {
 	if (!game) { return 1; }
 
 	SetBackgroundColor(game, al_map_rgb(255, 255, 255));
-	libsuperderpy_mainloop(game);
 
 	LoadGamestate(game, "holypangolin");
 	StartGamestate(game, "holypangolin");
