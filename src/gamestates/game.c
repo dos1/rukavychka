@@ -22,7 +22,6 @@
 #include <libsuperderpy.h>
 
 struct GamestateResources {
-	ALLEGRO_FONT* font;
 	ALLEGRO_BITMAP *bg, *bg2;
 	ALLEGRO_SHADER* shader;
 
@@ -45,7 +44,7 @@ struct GamestateResources {
 	bool found, won;
 };
 
-int Gamestate_ProgressCount = 9;
+int Gamestate_ProgressCount = 20;
 
 void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double delta) {
 	if (data->won) {
@@ -406,46 +405,52 @@ void Gamestate_ProcessEvent(struct Game* game, struct GamestateResources* data, 
 
 void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
 	struct GamestateResources* data = calloc(1, sizeof(struct GamestateResources));
-	int flags = al_get_new_bitmap_flags();
-	al_set_new_bitmap_flags(flags & ~ALLEGRO_MAG_LINEAR); // disable linear scaling for pixelarty appearance
-	data->font = al_create_builtin_font();
-	progress(game); // report that we progressed with the loading, so the engine can move a progress bar
-	al_set_new_bitmap_flags(flags);
 
 	data->mask1 = al_load_bitmap(GetDataFilePath(game, "plansze/maska_1_nowa.png"));
+	progress(game);
 	data->mask2 = al_load_bitmap(GetDataFilePath(game, "plansze/maska_2_nowa.png"));
+	progress(game);
 
 	data->bg = al_load_bitmap(GetDataFilePath(game, "plansze/nowsze/tlo1a_z_drzwiami.png"));
+	progress(game);
 	data->bg2 = al_load_bitmap(GetDataFilePath(game, "plansze/nowsze/tlo2a_bez_drzwi.png"));
+	progress(game);
 	data->shader = CreateShader(game, GetDataFilePath(game, "shaders/vertex.glsl"), GetDataFilePath(game, "shaders/combine.glsl"));
+	progress(game);
 
 	data->koniec = al_load_bitmap(GetDataFilePath(game, "ekran_koncowy_nowy.png"));
+	progress(game);
 
 	data->player = al_load_bitmap(GetDataFilePath(game, "player.png"));
+	progress(game);
 
 	data->player1 = al_load_audio_stream(GetDataFilePath(game, "player2.flac"), 4, 2048);
 	al_set_audio_stream_playing(data->player1, false);
 	al_attach_audio_stream_to_mixer(data->player1, game->audio.fx);
 	al_set_audio_stream_gain(data->player1, 1.5);
 	al_set_audio_stream_playmode(data->player1, ALLEGRO_PLAYMODE_ONCE);
+	progress(game);
 
 	data->player2 = al_load_audio_stream(GetDataFilePath(game, "player1.flac"), 4, 2048);
 	al_set_audio_stream_playing(data->player2, false);
 	al_attach_audio_stream_to_mixer(data->player2, game->audio.fx);
 	al_set_audio_stream_gain(data->player2, 1.0);
 	al_set_audio_stream_playmode(data->player2, ALLEGRO_PLAYMODE_ONCE);
+	progress(game);
 
 	data->obj = al_load_audio_stream(GetDataFilePath(game, "obj.flac"), 4, 2048);
 	al_set_audio_stream_playing(data->obj, false);
 	al_attach_audio_stream_to_mixer(data->obj, game->audio.fx);
 	al_set_audio_stream_gain(data->obj, 2.0);
 	al_set_audio_stream_playmode(data->obj, ALLEGRO_PLAYMODE_ONCE);
+	progress(game);
 
 	data->win = al_load_audio_stream(GetDataFilePath(game, "win.flac"), 4, 2048);
 	al_set_audio_stream_playing(data->win, false);
 	al_attach_audio_stream_to_mixer(data->win, game->audio.fx);
 	al_set_audio_stream_gain(data->win, 1.5);
 	al_set_audio_stream_playmode(data->win, ALLEGRO_PLAYMODE_ONCE);
+	progress(game);
 
 	data->lisek = CreateCharacter(game, "lisek");
 	RegisterSpritesheet(game, data->lisek, "walk");
@@ -472,13 +477,13 @@ void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
 
 	data->bg_anim = CreateNotPreservedBitmap(al_get_bitmap_width(data->bg), al_get_bitmap_height(data->bg));
 	data->bg_anim2 = CreateNotPreservedBitmap(al_get_bitmap_width(data->bg2), al_get_bitmap_height(data->bg2));
+	progress(game);
 
 	data->w1 = CreateNotPreservedBitmap(game->viewport.width, game->viewport.height);
 	return data;
 }
 
 void Gamestate_Unload(struct Game* game, struct GamestateResources* data) {
-	al_destroy_font(data->font);
 	al_destroy_bitmap(data->bg);
 	al_destroy_bitmap(data->bg2);
 	al_destroy_bitmap(data->bg_anim);
@@ -517,6 +522,16 @@ void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 	data->smok->scaleX = 0.3;
 	data->smok->scaleY = 0.3;
 	SetCharacterPosition(game, data->drzwi, 1050, 750, 0.0);
+	data->found = false;
+	data->won = false;
+	data->shown1 = false;
+	data->shown2 = false;
 }
 
 void Gamestate_Stop(struct Game* game, struct GamestateResources* data) {}
+
+void Gamestate_Reload(struct Game* game, struct GamestateResources* data) {
+	data->bg_anim = CreateNotPreservedBitmap(al_get_bitmap_width(data->bg), al_get_bitmap_height(data->bg));
+	data->bg_anim2 = CreateNotPreservedBitmap(al_get_bitmap_width(data->bg2), al_get_bitmap_height(data->bg2));
+	data->w1 = CreateNotPreservedBitmap(game->viewport.width, game->viewport.height);
+}
