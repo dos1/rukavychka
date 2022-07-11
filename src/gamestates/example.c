@@ -537,7 +537,7 @@ void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 	data->lisek->scaleY = 0.32;
 	data->smok->scaleX = 0.3;
 	data->smok->scaleY = 0.3;
-	SetCharacterPosition(game, data->drzwi, 1100, 750, 0.0);
+	SetCharacterPosition(game, data->drzwi, 1050, 750, 0.0);
 }
 
 void Gamestate_Stop(struct Game* game, struct GamestateResources* data) {}
