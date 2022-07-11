@@ -28,7 +28,7 @@ struct GamestateResources {
 
 	ALLEGRO_BITMAP* player;
 
-	ALLEGRO_BITMAP *bg_anim, *bg_anim2, *mask1, *mask2, *p1, *p2, *w1, *koniec;
+	ALLEGRO_BITMAP *bg_anim, *bg_anim2, *mask1, *mask2, *w1, *koniec;
 
 	bool w, s, a, d;
 	double x, y;
@@ -125,10 +125,8 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 	PrintConsole(game, "lisek: %f %f", GetCharacterX(game, data->lisek), GetCharacterY(game, data->lisek));
 	PrintConsole(game, "smok: %f %f", GetCharacterX(game, data->smok), GetCharacterY(game, data->smok));
 
-	ALLEGRO_COLOR color1 = al_get_pixel(data->p1, GetCharacterX(game, data->drzwi), GetCharacterY(game, data->drzwi));
-	ALLEGRO_COLOR color2 = al_get_pixel(data->p2, GetCharacterX(game, data->myszka), GetCharacterY(game, data->myszka));
-
-	if (color1.a && color2.a) {
+	if (IsOnCharacter(game, data->lisek, GetCharacterX(game, data->drzwi), GetCharacterY(game, data->drzwi), true) &&
+		IsOnCharacter(game, data->smok, GetCharacterX(game, data->myszka), GetCharacterY(game, data->myszka), true)) {
 		if (!data->found) {
 			al_rewind_audio_stream(data->obj);
 			al_set_audio_stream_playing(data->obj, true);
@@ -162,18 +160,6 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	if (!data->found)
 		DrawCharacter(game, data->myszka);
 	al_draw_filled_rectangle(0, 0, 1920, 1080, al_map_rgba(0, 0, 0, 20));
-
-	al_set_target_bitmap(data->p1);
-	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
-	if (data->shown1) {
-		DrawCharacter(game, data->lisek);
-	}
-	al_set_target_bitmap(data->p2);
-	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
-	if (data->shown2) {
-		DrawCharacter(game, data->smok);
-		// al_draw_bitmap(data->player, 1920 * data->x2, 1080 * data->y2, 0);
-	}
 
 	SetFramebufferAsTarget(game);
 	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
@@ -226,10 +212,7 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 		int sx = GetCharacterX(game, data->smok) + 45 * (data->smok->flipX ? 1 : -1) - 50;
 		int sy = GetCharacterY(game, data->smok) + 50;
 
-		ALLEGRO_COLOR color1 = al_get_pixel(data->p1, mx, my);
-		ALLEGRO_COLOR color2 = al_get_pixel(data->p2, mx, my);
-
-		if (color1.a) {
+		if (IsOnCharacter(game, data->lisek, mx, my, true)) {
 			bool connected = true;
 
 			double a = my - ly;
@@ -268,7 +251,7 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 			}
 		}
 
-		if (color2.a) {
+		if (IsOnCharacter(game, data->smok, mx, my, true)) {
 			bool connected = true;
 
 			double a = my - sy;
@@ -490,8 +473,6 @@ void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
 	data->bg_anim = CreateNotPreservedBitmap(al_get_bitmap_width(data->bg), al_get_bitmap_height(data->bg));
 	data->bg_anim2 = CreateNotPreservedBitmap(al_get_bitmap_width(data->bg2), al_get_bitmap_height(data->bg2));
 
-	data->p1 = CreateNotPreservedBitmap(game->viewport.width, game->viewport.height);
-	data->p2 = CreateNotPreservedBitmap(game->viewport.width, game->viewport.height);
 	data->w1 = CreateNotPreservedBitmap(game->viewport.width, game->viewport.height);
 	return data;
 }
@@ -505,8 +486,6 @@ void Gamestate_Unload(struct Game* game, struct GamestateResources* data) {
 	al_destroy_bitmap(data->player);
 	al_destroy_bitmap(data->mask1);
 	al_destroy_bitmap(data->mask2);
-	al_destroy_bitmap(data->p1);
-	al_destroy_bitmap(data->p2);
 	al_destroy_bitmap(data->w1);
 	al_destroy_bitmap(data->koniec);
 	DestroyShader(game, data->shader);
