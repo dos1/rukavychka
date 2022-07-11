@@ -57,7 +57,7 @@ void Compositor(struct Game* game) {
 
 	if (game->data->won) {
 		double col = 1.0 - pow(al_get_sample_instance_gain(game->data->sample_instance) / 0.32, 0.5);
-		al_draw_filled_rectangle(game->clip_rect.x, game->clip_rect.y, game->clip_rect.w, game->clip_rect.h,
+		al_draw_filled_rectangle(0, 0, al_get_display_width(game->display), al_get_display_height(game->display),
 			al_map_rgba_f(0, 0, 0, col));
 	}
 }
@@ -76,12 +76,12 @@ bool GlobalEventHandler(struct Game* game, ALLEGRO_EVENT* ev) {
 
 void PreLogic(struct Game* game, double delta) {
 	if (game->data->won) {
-		al_set_sample_instance_gain(game->data->sample_instance, fmax(0.00, al_get_sample_instance_gain(game->data->sample_instance) - delta / 16.0));
 		if (al_get_sample_instance_gain(game->data->sample_instance) == 0.00) {
 			SetBackgroundColor(game, al_map_rgb(0, 0, 0));
 			al_rest(1.0);
 			QuitGame(game, false);
 		}
+		al_set_sample_instance_gain(game->data->sample_instance, fmax(0.00, al_get_sample_instance_gain(game->data->sample_instance) - delta / 16.0));
 	} else {
 		al_set_sample_instance_gain(game->data->sample_instance, fmin(0.32, al_get_sample_instance_gain(game->data->sample_instance) + delta / 8.0));
 	}
