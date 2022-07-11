@@ -22,7 +22,7 @@
 #include <libsuperderpy.h>
 #include <math.h>
 
-#define NEXT_GAMESTATE "example"
+#define NEXT_GAMESTATE "game"
 #define SKIP_GAMESTATE NEXT_GAMESTATE
 
 struct GamestateResources {
@@ -157,8 +157,7 @@ void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 
 void Gamestate_ProcessEvent(struct Game* game, struct GamestateResources* data, ALLEGRO_EVENT* ev) {
 	if (((ev->type == ALLEGRO_EVENT_KEY_DOWN) && (ev->keyboard.keycode == ALLEGRO_KEY_ESCAPE)) || (ev->type == ALLEGRO_EVENT_TOUCH_END) || (ev->type == ALLEGRO_EVENT_JOYSTICK_BUTTON_UP)) {
-		UnloadAllGamestates(game);
-		StartGamestate(game, SKIP_GAMESTATE);
+		SwitchCurrentGamestate(game, SKIP_GAMESTATE);
 	}
 }
 

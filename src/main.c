@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
 	SetBackgroundColor(game, al_map_rgb(255, 255, 255));
 
 	LoadGamestate(game, "holypangolin");
-	LoadGamestate(game, "example");
+	LoadGamestate(game, "game");
 	StartGamestate(game, "holypangolin");
 
 	game->data = CreateGameData(game);
