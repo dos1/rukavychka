@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Rukavychka</title>
+    <style>
+      html {
+        overflow: hidden;
+      }
+      html, body {
+        background-color: white;
+        margin: 0;
+        padding: 0;
+        user-select: none;
+      }
+      @media (prefers-color-scheme: dark) {
+        /* try to fool some addons that try to invert the page colors to simulate dark themes */
+        /* if they see that there's already dark theme in the stylesheet, they may give up */
+        body {
+          background-color: #ffffff;
+        }
+      }
+      .emscripten {
+        padding-right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+      }
+      textarea.emscripten {
+        font-family: monospace;
+        width: 80%;
+        display: none;
+      }
+      div.emscripten {
+        text-align: center;
+      }
+      .emscripten_border {
+        position: relative;
+        width: 1920px;
+      }
+      /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
+      canvas.emscripten {
+        border: 0px none;
+        background-color: white;
+        width: 1920px;
+        height: 1080px;
+      }
+      .loading, .loading-bar-wrapper, .loading > canvas {
+        border: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 999;
+      }
+      .loading {
+        background-color: white;
+      }
+      .loading img {
+        pointer-events: none;
+      }
+      .error {
+        position: absolute;
+        font-family: monospace;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 0, 0, 0.75);
+        text-shadow: 1px 2px 2px black;
+        font-size: 200%;
+        color: white;
+        text-align: center;
+        padding-top: 2.5em;
+        box-sizing: border-box;
+        z-index: 1001;
+      }
+      .loading-bar-bg, .loading-bar {
+        position: absolute;
+        top: calc(50% - 24px);
+        left: calc(50% - 176px);
+      }
+      .loading-bar-bg {
+        opacity: 0.25;
+        filter: contrast(150%) brightness(150%);
+      }
+      .loading-bar {
+        width: 353px;
+        height: 49px;
+        background-color: black;
+      }
+      .blocker {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        background: rgba(0,0,0,0.69);
+        z-index: 1000;
+      }
+      .blocker.active {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="emscripten_border" id="wrapper">
+      <canvas class="emscripten" id="canvas" width="1920" height="1080"></canvas>
+      <div class="blocker"></div>
+      <div id="loading" class="loading">
+        <div class="loading-bar-wrapper">
+          <div class="loading-bar" id="loading-bar" style="width: 0px"></div>
+        </div>
+      </div>
+
+      <noscript>
+        <div class="error">
+          <p>JavaScript support required :(</p>
+        </div>
+      </noscript>
+
+    </div>
+
+    <script type='text/javascript'>
+
+      // for correct focus/blur handling in iframes (otherwise canvas eats the events and the engine stays paused)
+      window.addEventListener('focus', function() {
+        document.querySelector('.blocker').classList.remove('active');
+      });
+      window.addEventListener('blur', function() {
+        document.querySelector('.blocker').classList.add('active');
+      });
+      if (!document.hasFocus()) {
+        document.querySelector('.blocker').classList.add('active');
+      }
+
+      var Module = {
+        preRun: [],
+        postRun: [],
+        print: console.log,
+        printErr: console.error,
+        canvas: (function() {
+          var canvas = document.getElementById('canvas');
+
+          // As a default initial behavior, pop up an alert when webgl context is lost. To make your
+          // application robust, you may want to override this behavior before shipping!
+          // See http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15.2
+          canvas.addEventListener("webglcontextlost", function(e) { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
+
+          return canvas;
+        })(),
+        setError: function(text) {
+          var err = document.createElement('div');
+          err.classList.add('error');
+          err.innerHTML = '<p>'+text+'</p><p>Please refresh the page.</p>';
+          document.getElementById('wrapper').appendChild(err);
+        },
+        drawProgress: function(progress) {
+          document.getElementById('loading-bar').style.width = ~~(progress * 353) + 'px';
+        },
+        setStatus: function(text) {
+          if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
+          if (text === Module.setStatus.last.text) return;
+          var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+          var now = Date.now();
+          if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
+          Module.setStatus.last.time = now;
+          Module.setStatus.last.text = text;
+          if (m) {
+            text = m[1];
+            if (text == "Downloading data... ") {
+               m[2] *= 0.9;
+            } else if (text == "Preparing... ") {
+               m[2] = m[2] * 0.1 + 0.9 * m[4];
+            }
+            //console.log(parseInt(m[2])*100, parseInt(m[4])*100);
+            Module.drawProgress((parseInt(m[2]) / parseInt(m[4])));
+          } else {
+            console.log('***** ***');
+          }
+          console.info(text);
+          if (text == "Running...")  document.getElementById('loading').style.display = 'none';
+        },
+        totalDependencies: 0,
+        monitorRunDependencies: function(left) {
+          this.totalDependencies = Math.max(this.totalDependencies, left);
+          Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+        },
+        adjustSize: function() {
+          var scale = Math.min(window.innerWidth/1920.0, window.innerHeight/1080.0);
+          var x = (window.innerWidth - 1920 * scale) / 2;
+          var y = (window.innerHeight - 1080 * scale) / 2;
+          document.querySelector('body').style = 'padding-left: ' + x + 'px; padding-top: ' + y + 'px;';
+          var wrapper = document.getElementById('wrapper');
+          console.log(wrapper);
+          Array.prototype.forEach.apply(wrapper.children, [function(elem) {
+            if (scale != 1.0) {
+              elem.style.transform = 'scale(' + scale + ')';
+              elem.style.transformOrigin = 'top left';
+            } else {
+              elem.style.transform = '';
+            }
+          }]);
+        }
+      };
+      Module.setStatus('Downloading...');
+      Module.drawProgress(0);
+
+      window.onresize = Module.adjustSize;
+      Module.adjustSize();
+
+      window.onerror = function() {
+        Module.setStatus('Exception thrown, see JavaScript console');
+        console.error(arguments);
+        //Module.setError('Error 102: 0x0000012S0WK4');
+      };
+    </script>
+
+    <script type='text/javascript'>
+      var ASSERTIONS = 0;
+      // Copyright 2017 The Emscripten Authors.  All rights reserved.
+      // Emscripten is available under two separate licenses, the MIT license and the
+      // University of Illinois/NCSA Open Source License.  Both these licenses can be
+      // found in the LICENSE file.
+
+      // Prefix of data URIs emitted by SINGLE_FILE and related options.
+      var dataURIPrefix = 'data:application/octet-stream;base64,';
+
+      // Indicates whether filename is a base64 data URI.
+      function isDataURI(filename) {
+        return String.prototype.startsWith ?
+            filename.startsWith(dataURIPrefix) :
+            filename.indexOf(dataURIPrefix) === 0;
+      }
+
+      // Copied from https://github.com/strophe/strophejs/blob/e06d027/src/polyfills.js#L149
+
+      // This code was written by Tyler Akins and has been placed in the
+      // public domain.  It would be nice if you left this header intact.
+      // Base64 code from Tyler Akins -- http://rumkin.com
+
+      /**
+      * Decodes a base64 string.
+      * @param {String} input The string to decode.
+      */
+      var decodeBase64 = typeof atob === 'function' ? atob : function (input) {
+        var keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+
+        var output = '';
+        var chr1, chr2, chr3;
+        var enc1, enc2, enc3, enc4;
+        var i = 0;
+        // remove all characters that are not A-Z, a-z, 0-9, +, /, or =
+        input = input.replace(/[^A-Za-z0-9\+\/\=]/g, '');
+        do {
+          enc1 = keyStr.indexOf(input.charAt(i++));
+          enc2 = keyStr.indexOf(input.charAt(i++));
+          enc3 = keyStr.indexOf(input.charAt(i++));
+          enc4 = keyStr.indexOf(input.charAt(i++));
+
+          chr1 = (enc1 << 2) | (enc2 >> 4);
+          chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+          chr3 = ((enc3 & 3) << 6) | enc4;
+
+          output = output + String.fromCharCode(chr1);
+
+          if (enc3 !== 64) {
+            output = output + String.fromCharCode(chr2);
+          }
+          if (enc4 !== 64) {
+            output = output + String.fromCharCode(chr3);
+          }
+        } while (i < input.length);
+        return output;
+      };
+
+      // Converts a string of base64 into a byte array.
+      // Throws error on invalid input.
+      function intArrayFromBase64(s) {
+        if (typeof ENVIRONMENT_IS_NODE === 'boolean' && ENVIRONMENT_IS_NODE) {
+          var buf;
+          try {
+            buf = Buffer.from(s, 'base64');
+          } catch (_) {
+            buf = new Buffer(s, 'base64');
+          }
+          return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
+        }
+
+        try {
+          var decoded = decodeBase64(s);
+          var bytes = new Uint8Array(decoded.length);
+          for (var i = 0 ; i < decoded.length ; ++i) {
+            bytes[i] = decoded.charCodeAt(i);
+          }
+          return bytes;
+        } catch (_) {
+          throw new Error('Converting base64 string to bytes failed.');
+        }
+      }
+
+      // If filename is a base64 data URI, parses and returns data (Buffer on node,
+      // Uint8Array otherwise). If filename is not a base64 data URI, returns undefined.
+      function tryParseAsDataURI(filename) {
+        if (!isDataURI(filename)) {
+          return;
+        }
+
+        return intArrayFromBase64(filename.slice(dataURIPrefix.length));
+      }
+
+
+      // Copyright 2017 The Emscripten Authors.  All rights reserved.
+      // Emscripten is available under two separate licenses, the MIT license and the
+      // University of Illinois/NCSA Open Source License.  Both these licenses can be
+      // found in the LICENSE file.
+
+      /** @type {function(string, boolean=, number=)} */
+      function intArrayFromString(stringy, dontAddNull, length) {
+        var len = length > 0 ? length : lengthBytesUTF8(stringy)+1;
+        var u8array = new Array(len);
+        var numBytesWritten = stringToUTF8Array(stringy, u8array, 0, u8array.length);
+        if (dontAddNull) u8array.length = numBytesWritten;
+        return u8array;
+      }
+
+      function intArrayToString(array) {
+        var ret = [];
+        for (var i = 0; i < array.length; i++) {
+          var chr = array[i];
+          if (chr > 0xFF) {
+            if (ASSERTIONS) {
+              assert(false, 'Character code ' + chr + ' (' + String.fromCharCode(chr) + ')  at offset ' + i + ' not in 0x00-0xFF.');
+            }
+            chr &= 0xFF;
+          }
+          ret.push(String.fromCharCode(chr));
+        }
+        return ret.join('');
+      }
+
+
+      (function() {
+
+        var canvas = document.createElement("canvas");
+        canvas.addEventListener('webglcontextcreationerror', function(e) {
+          console.error(e.statusMessage || 'Unknown error');
+        }, false);
+        // Get WebGLRenderingContext from canvas element.
+        var gl = canvas.getContext("webgl", { failIfMajorPerformanceCaveat: true });
+        // Report the result.
+        if (!(gl && gl instanceof WebGLRenderingContext)) {
+          Module.setError('Error 104: 0x0000014S0WK4 - WebGL not supported');
+          return;
+        }
+
+        var emterpretURL = 'rukavychka.emterpret.js';
+        var emterpretXHR = new XMLHttpRequest();
+        emterpretXHR.open('GET', emterpretURL, true);
+        emterpretXHR.responseType = 'arraybuffer';
+        emterpretXHR.onload = function() {
+          if (emterpretXHR.status === 200 || emterpretXHR.status === 0) {
+            Module.emterpreterFile = emterpretXHR.response;
+          } else {
+            var emterpretURLBytes = tryParseAsDataURI(emterpretURL);
+            if (emterpretURLBytes) {
+              Module.emterpreterFile = emterpretURLBytes.buffer;
+            }
+          }
+
+        var script = document.createElement('script');
+        script.src = "rukavychka.js";
+        script.onerror = function(err) {
+          Module.setError('Error 103: 0x0000013S0WK4');
+        };
+        document.body.appendChild(script);
+
+        };
+        emterpretXHR.send(null);
+      })();
+
+    </script>
+
+  </body>
+</html>
