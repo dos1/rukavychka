@@ -300,9 +300,9 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 		al_set_shader_float("brightness", 1.0);
 		al_set_shader_float("saturation", 1.2);
 
-		data->transition->scaleX = data->transition->scaleY = 0.15 * (data->transition->pos + 1);
+		data->transition->scaleX = data->transition->scaleY = 0.30 * (data->transition->pos + 1);
 		if (data->transition->spritesheet->frame_count == 1) {
-			data->transition->scaleX = data->transition->scaleY = 2.0;
+			data->transition->scaleX = data->transition->scaleY = 4.0;
 		}
 		DrawCharacter(game, data->transition);
 
@@ -501,14 +501,14 @@ void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 	data->y2 = 0.55;
 	data->lisek->flipX = true;
 	SetCharacterPosition(game, data->myszka, 360, 100, 0.0);
-	data->myszka->scaleX = 0.15;
-	data->myszka->scaleY = 0.15;
+	data->myszka->scaleX = 0.5;
+	data->myszka->scaleY = 0.5;
 	data->drzwi->scaleX = 0.15;
 	data->drzwi->scaleY = 0.15;
-	data->lisek->scaleX = 0.32;
-	data->lisek->scaleY = 0.32;
-	data->smok->scaleX = 0.3;
-	data->smok->scaleY = 0.3;
+	data->lisek->scaleX = 0.64;
+	data->lisek->scaleY = 0.64;
+	data->smok->scaleX = 0.6;
+	data->smok->scaleY = 0.6;
 	SetCharacterPosition(game, data->drzwi, 1050, 750, 0.0);
 	data->found = false;
 	data->won = false;
