@@ -25,8 +25,6 @@ struct GamestateResources {
 	ALLEGRO_BITMAP *bg, *bg2;
 	ALLEGRO_SHADER* shader;
 
-	ALLEGRO_BITMAP* player;
-
 	ALLEGRO_BITMAP *bg_anim2, *mask1, *mask2, *koniec;
 
 	bool w, s, a, d;
@@ -44,7 +42,7 @@ struct GamestateResources {
 	bool found, won;
 };
 
-int Gamestate_ProgressCount = 19;
+int Gamestate_ProgressCount = 18;
 
 void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double delta) {
 	if (data->won) {
@@ -183,14 +181,12 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 
 	if (data->shown1) {
 		DrawCharacter(game, data->lisek);
-		// al_draw_bitmap(data->player, 1920 * data->x, 1080 * data->y, 0);
 	}
 
 	al_set_shader_sampler("tex", data->bg_anim2, 1);
 	SetCharacterPosition(game, data->smok, 1920 * data->x2, 1080 * data->y2, 0);
 	if (data->shown2) {
 		DrawCharacter(game, data->smok);
-		// al_draw_bitmap(data->player, 1920 * data->x2, 1080 * data->y2, 0);
 	}
 
 	al_use_shader(NULL);
@@ -416,9 +412,6 @@ void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
 	data->koniec = al_load_bitmap(GetDataFilePath(game, "ekran_koncowy_nowy.png"));
 	progress(game);
 
-	data->player = al_load_bitmap(GetDataFilePath(game, "player.png"));
-	progress(game);
-
 	data->player1 = al_load_audio_stream(GetDataFilePath(game, "player2.flac"), 4, 2048);
 	al_set_audio_stream_playing(data->player1, false);
 	al_attach_audio_stream_to_mixer(data->player1, game->audio.fx);
@@ -479,7 +472,6 @@ void Gamestate_Unload(struct Game* game, struct GamestateResources* data) {
 	al_destroy_bitmap(data->bg);
 	al_destroy_bitmap(data->bg2);
 	al_destroy_bitmap(data->bg_anim2);
-	al_destroy_bitmap(data->player);
 	al_destroy_bitmap(data->mask1);
 	al_destroy_bitmap(data->mask2);
 	al_destroy_bitmap(data->koniec);
