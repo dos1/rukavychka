@@ -134,8 +134,8 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 	}
 
 	if (IsOnCharacter(game, data->drzwi, GetCharacterX(game, data->myszka) + 60, GetCharacterY(game, data->myszka), false)) {
-		PrintConsole(game, "WON");
 		if (!data->won) {
+			PrintConsole(game, "WON");
 			al_rewind_audio_stream(data->win);
 			al_set_audio_stream_playing(data->win, true);
 			SetCharacterPosition(game, data->transition, GetCharacterX(game, data->myszka) + 60, GetCharacterY(game, data->myszka), 0);
@@ -396,10 +396,13 @@ void Gamestate_ProcessEvent(struct Game* game, struct GamestateResources* data, 
 void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
 	struct GamestateResources* data = calloc(1, sizeof(struct GamestateResources));
 
+	int flags = al_get_new_bitmap_flags();
+	al_set_new_bitmap_flags((flags | ALLEGRO_MEMORY_BITMAP) & ~(ALLEGRO_VIDEO_BITMAP | ALLEGRO_CONVERT_BITMAP)); // use memory bitmap for faster pixel access
 	data->mask1 = al_load_bitmap(GetDataFilePath(game, "plansze/maska_1_nowa.png"));
 	progress(game);
 	data->mask2 = al_load_bitmap(GetDataFilePath(game, "plansze/maska_2_nowa.png"));
 	progress(game);
+	al_set_new_bitmap_flags(flags);
 
 	data->bg = al_load_bitmap(GetDataFilePath(game, "plansze/nowsze/tlo1a_z_drzwiami.png"));
 	progress(game);
