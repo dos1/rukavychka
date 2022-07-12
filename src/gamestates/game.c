@@ -562,8 +562,8 @@ void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 	SetCharacterPosition(game, data->myszka, 360, 100, 0.0);
 	data->myszka->scaleX = 0.5;
 	data->myszka->scaleY = 0.5;
-	data->drzwi->scaleX = 0.15;
-	data->drzwi->scaleY = 0.15;
+	data->drzwi->scaleX = 0.5;
+	data->drzwi->scaleY = 0.5;
 	data->lisek->scaleX = 0.64;
 	data->lisek->scaleY = 0.64;
 	data->smok->scaleX = 0.6;
