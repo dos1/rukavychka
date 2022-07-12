@@ -379,6 +379,71 @@ void Gamestate_ProcessEvent(struct Game* game, struct GamestateResources* data, 
 		data->d2 = false;
 		data->show2 = true;
 	}
+
+#ifdef ALLEGRO_WITH_XWINDOWS
+	if (ev->type == ALLEGRO_EVENT_JOYSTICK_AXIS && (ev->joystick.stick == 0 || ev->joystick.stick == 3)) {
+#else
+	if (ev->type == ALLEGRO_EVENT_JOYSTICK_AXIS && ev->joystick.stick == 0) {
+#endif
+		if (ev->joystick.axis == 1) {
+			if (ev->joystick.pos < -0.1) {
+				data->w = true;
+				data->show1 = true;
+			} else {
+				data->w = false;
+			}
+			if (ev->joystick.pos > 0.1) {
+				data->s = true;
+				data->show1 = true;
+			} else {
+				data->s = false;
+			}
+		}
+		if (ev->joystick.axis == 0) {
+			if (ev->joystick.pos < -0.1) {
+				data->a = true;
+				data->show1 = true;
+			} else {
+				data->a = false;
+			}
+			if (ev->joystick.pos > 0.1) {
+				data->d = true;
+				data->show1 = true;
+			} else {
+				data->d = false;
+			}
+		}
+	}
+
+	if (ev->type == ALLEGRO_EVENT_JOYSTICK_AXIS && ev->joystick.stick == 1) {
+		if (ev->joystick.axis == 1) {
+			if (ev->joystick.pos < -0.1) {
+				data->w2 = true;
+				data->show2 = true;
+			} else {
+				data->w2 = false;
+			}
+			if (ev->joystick.pos > 0.1) {
+				data->s2 = true;
+				data->show2 = true;
+			} else {
+				data->s2 = false;
+			}
+		} else {
+			if (ev->joystick.pos < -0.1) {
+				data->a2 = true;
+				data->show2 = true;
+			} else {
+				data->a2 = false;
+			}
+			if (ev->joystick.pos > 0.1) {
+				data->d2 = true;
+				data->show2 = true;
+			} else {
+				data->d2 = false;
+			}
+		}
+	}
 	/*
 	if ((ev->type == ALLEGRO_EVENT_KEY_DOWN) && (ev->keyboard.keycode == ALLEGRO_KEY_SPACE)) {
 		al_rewind_audio_stream(data->win);
