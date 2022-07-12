@@ -43,17 +43,16 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 }
 
 void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
-	float size[2] = {al_get_bitmap_width(data->bg), al_get_bitmap_height(data->bg)};
-	float offset[2] = {-20 * data->counter / (60.0 * 6.0), -15 * data->counter / (60.0 * 6.0)};
+	float offset[2] = {0.1521875 / 0.66 / 2.0 - 20 * data->counter / (60.0 * 6.0) / game->viewport.width, -15 * data->counter / (60.0 * 6.0) / game->viewport.height};
+	float scale[2] = {0.66, 0.66};
 
 	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
 	al_use_shader(data->shader);
 	al_set_shader_sampler("tex", data->bg, 1);
 	al_set_shader_float_vector("offset", 2, offset, 1);
-	al_set_shader_float_vector("size", 2, size, 1);
-	al_set_shader_float("scale", 1.0);
-	al_set_shader_bool("flipX", false);
-	al_set_shader_bool("flipY", false);
+	al_set_shader_float_vector("scale", 2, scale, 1);
+	al_set_shader_float("brightness", 1.0);
+	al_set_shader_float("saturation", 1.2);
 
 	double pos = pow(sin(data->counter / (15 * 7.5)), 0.9);
 	al_draw_tinted_scaled_bitmap(data->bmp, al_map_rgba_f(pos, pos, pos, pos), 0, 0, al_get_bitmap_width(data->bmp), al_get_bitmap_height(data->bmp), game->viewport.width * 0.165 + (game->viewport.width - (game->viewport.height * 0.66)) / 4.0, game->viewport.height * 0.165, game->viewport.height * 0.66, game->viewport.height * 0.66, 0);

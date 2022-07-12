@@ -27,7 +27,7 @@ struct GamestateResources {
 
 	ALLEGRO_BITMAP* player;
 
-	ALLEGRO_BITMAP *bg_anim, *bg_anim2, *mask1, *mask2, *w1, *koniec;
+	ALLEGRO_BITMAP *bg_anim2, *mask1, *mask2, *koniec;
 
 	bool w, s, a, d;
 	double x, y;
@@ -44,7 +44,7 @@ struct GamestateResources {
 	bool found, won;
 };
 
-int Gamestate_ProgressCount = 20;
+int Gamestate_ProgressCount = 19;
 
 void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double delta) {
 	if (data->won) {
@@ -147,37 +147,27 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 }
 
 void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
-	al_set_target_bitmap(data->bg_anim);
-	al_clear_to_color(al_map_rgba(255, 255, 255, 255));
-	al_draw_bitmap(data->bg, 0, 0, 0);
-	// if (!data->found)
-	//	DrawCharacter(game, data->drzwi);
-	al_draw_filled_rectangle(0, 0, 1920, 1080, al_map_rgba(0, 0, 0, 20));
 	al_set_target_bitmap(data->bg_anim2);
 	al_clear_to_color(al_map_rgba(255, 255, 255, 255));
 	al_draw_bitmap(data->bg2, 0, 0, 0);
 	if (!data->found)
 		DrawCharacter(game, data->myszka);
-	al_draw_filled_rectangle(0, 0, 1920, 1080, al_map_rgba(0, 0, 0, 20));
 
 	SetFramebufferAsTarget(game);
 	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
 
-	float size[2] = {al_get_bitmap_width(data->bg), al_get_bitmap_height(data->bg)};
+	float scale[2] = {1.0, 1.0};
 	float offset[2] = {
-		-1920 * ((data->lisek->flipX ? 1.0 : 0.0) + data->x * (data->lisek->flipX ? -1.0 : 1.0)) + sin(al_get_time() / 2.0) * (data->lisek->flipX ? -4 : 4) + al_get_bitmap_width(data->lisek->frame->bitmap) * data->lisek->flipX * data->lisek->scaleX,
-		-1080 * ((data->lisek->flipY ? 1.0 : 0.0) + data->y * (data->lisek->flipY ? -1.0 : 1.0)) + cos(al_get_time() / 2.9) * (data->lisek->flipY ? -3 : 3) + al_get_bitmap_height(data->lisek->frame->bitmap) * data->lisek->scaleY / 2.0};
-	float offset2[2] = {
-		-1920 * ((data->smok->flipX ? 1.0 : 0.0) + data->x2 * (data->smok->flipX ? -1.0 : 1.0)) + sin(al_get_time() / 2.0) * (data->smok->flipX ? -4 : 4) + al_get_bitmap_width(data->smok->frame->bitmap) * data->smok->scaleX / 2.0,
-		-1080 * ((data->smok->flipY ? 1.0 : 0.0) + data->y2 * (data->smok->flipY ? -1.0 : 1.0)) + cos(al_get_time() / 2.9) * (data->smok->flipY ? -3 : 3) + al_get_bitmap_height(data->smok->frame->bitmap) * data->smok->scaleY / 2.0};
+		sin(al_get_time() / 2.0) * 4.0 / 1920.0,
+		cos(al_get_time() / 2.9) * 3.0 / 1080.0,
+	};
 
 	al_use_shader(data->shader);
-	al_set_shader_sampler("tex", data->bg_anim, 1);
-	al_set_shader_float_vector("size", 2, size, 1);
+	al_set_shader_sampler("tex", data->bg, 1);
 	al_set_shader_float_vector("offset", 2, offset, 1);
-	al_set_shader_float("scale", data->lisek->scaleX);
-	al_set_shader_bool("flipX", data->lisek->flipX);
-	al_set_shader_bool("flipY", data->lisek->flipY);
+	al_set_shader_float_vector("scale", 2, scale, 1);
+	al_set_shader_float("saturation", 1.2);
+	al_set_shader_float("brightness", 0.922);
 
 	SetCharacterPosition(game, data->lisek, 1920 * data->x, 1080 * data->y, 0);
 
@@ -186,11 +176,7 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 		// al_draw_bitmap(data->player, 1920 * data->x, 1080 * data->y, 0);
 	}
 
-	al_set_shader_float_vector("offset", 2, offset2, 1);
 	al_set_shader_sampler("tex", data->bg_anim2, 1);
-	al_set_shader_bool("flipX", data->smok->flipX);
-	al_set_shader_bool("flipY", data->smok->flipY);
-	al_set_shader_float("scale", data->smok->scaleX);
 	SetCharacterPosition(game, data->smok, 1920 * data->x2, 1080 * data->y2, 0);
 	if (data->shown2) {
 		DrawCharacter(game, data->smok);
@@ -296,26 +282,20 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	}
 
 	if (data->won) {
-		al_set_target_bitmap(data->w1);
-		al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+		al_use_shader(data->shader);
+		al_set_shader_sampler("tex", data->koniec, 1);
+		float offset0[2] = {0, 0};
+		al_set_shader_float_vector("offset", 2, offset0, 1);
+		al_set_shader_float_vector("scale", 2, scale, 1);
+		al_set_shader_float("brightness", 1.0);
+		al_set_shader_float("saturation", 1.0);
+
 		data->transition->scaleX = data->transition->scaleY = 0.15 * (data->transition->pos + 1);
 		if (data->transition->spritesheet->frame_count == 1) {
 			data->transition->scaleX = data->transition->scaleY = 2.0;
 		}
 		DrawCharacter(game, data->transition);
 
-		SetFramebufferAsTarget(game);
-		al_use_shader(data->shader);
-		al_set_shader_sampler("tex", data->koniec, 1);
-		al_set_shader_float_vector("size", 2, size, 1);
-		al_set_shader_float("scale", 1.0);
-		float offset[2] = {
-			0, 0};
-		al_set_shader_float_vector("offset", 2, offset, 1);
-		al_set_shader_bool("flipX", false);
-		al_set_shader_bool("flipY", false);
-		al_draw_bitmap(data->w1, 0, 0, 0);
-		// DrawCharacter(game, data->transition);
 		al_use_shader(NULL);
 	}
 
@@ -485,23 +465,18 @@ void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
 	RegisterSpritesheet(game, data->transition, "still");
 	LoadSpritesheets(game, data->transition, progress);
 
-	data->bg_anim = CreateNotPreservedBitmap(al_get_bitmap_width(data->bg), al_get_bitmap_height(data->bg));
 	data->bg_anim2 = CreateNotPreservedBitmap(al_get_bitmap_width(data->bg2), al_get_bitmap_height(data->bg2));
-	progress(game);
 
-	data->w1 = CreateNotPreservedBitmap(game->viewport.width, game->viewport.height);
 	return data;
 }
 
 void Gamestate_Unload(struct Game* game, struct GamestateResources* data) {
 	al_destroy_bitmap(data->bg);
 	al_destroy_bitmap(data->bg2);
-	al_destroy_bitmap(data->bg_anim);
 	al_destroy_bitmap(data->bg_anim2);
 	al_destroy_bitmap(data->player);
 	al_destroy_bitmap(data->mask1);
 	al_destroy_bitmap(data->mask2);
-	al_destroy_bitmap(data->w1);
 	al_destroy_bitmap(data->koniec);
 	DestroyShader(game, data->shader);
 	al_destroy_audio_stream(data->player1);
@@ -541,7 +516,5 @@ void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 void Gamestate_Stop(struct Game* game, struct GamestateResources* data) {}
 
 void Gamestate_Reload(struct Game* game, struct GamestateResources* data) {
-	data->bg_anim = CreateNotPreservedBitmap(al_get_bitmap_width(data->bg), al_get_bitmap_height(data->bg));
 	data->bg_anim2 = CreateNotPreservedBitmap(al_get_bitmap_width(data->bg2), al_get_bitmap_height(data->bg2));
-	data->w1 = CreateNotPreservedBitmap(game->viewport.width, game->viewport.height);
 }

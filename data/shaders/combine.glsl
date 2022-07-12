@@ -4,14 +4,13 @@ precision highp float;
 
 uniform sampler2D al_tex;
 uniform sampler2D tex;
-uniform vec2 size;
 uniform vec2 offset;
-uniform float scale;
-uniform bool flipX;
-uniform bool flipY;
+uniform vec2 scale;
+uniform float saturation;
+uniform float brightness;
 varying vec2 varying_texcoord;
 varying vec4 varying_color;
-varying vec4 varying_origpos;
+varying vec4 varying_pos;
 
 vec3 convertRgbToHsl(vec3 c) { 
     vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0); 
@@ -31,11 +30,9 @@ vec3 convertHslToRgb(vec3 c) {
 
 void main() {
 	vec4 color = texture2D(al_tex, varying_texcoord);
-	vec2 pos = (varying_origpos.xy * scale - offset) / size;
-	vec4 tex_color = texture2D(tex, vec2(flipX ? 1.0 : 0.0, flipY ? 0.0 : 1.0) - pos * vec2(flipX ? 1.0 : -1.0, flipY ? -1.0 : 1.0));
-	tex_color *= color.a;
-	vec3 sat = convertRgbToHsl(tex_color.rgb);
-	sat.g *= 1.2;
-	tex_color = vec4(convertHslToRgb(sat), tex_color.a);
-	gl_FragColor = tex_color * varying_color; //mix(color, tex_color, color.r) * varying_color;
+	vec4 tex_color = texture2D(tex, (varying_pos.xy / scale + 1.0) / 2.0 - offset * vec2(2.0, -2.0));
+	vec3 sat = convertRgbToHsl(tex_color.rgb * color.a);
+	sat.y *= saturation;
+	sat.z *= brightness;
+	gl_FragColor = vec4(convertHslToRgb(sat), tex_color.a * color.a) * varying_color;
 }
