@@ -298,7 +298,7 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 		al_set_shader_float_vector("offset", 2, offset0, 1);
 		al_set_shader_float_vector("scale", 2, scale, 1);
 		al_set_shader_float("brightness", 1.0);
-		al_set_shader_float("saturation", 1.0);
+		al_set_shader_float("saturation", 1.2);
 
 		data->transition->scaleX = data->transition->scaleY = 0.15 * (data->transition->pos + 1);
 		if (data->transition->spritesheet->frame_count == 1) {
