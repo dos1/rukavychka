@@ -43,7 +43,7 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 }
 
 void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
-	float offset[2] = {0.1521875 / 0.66 / 2.0 - 20 * data->counter / (60.0 * 6.0) / game->viewport.width, -15 * data->counter / (60.0 * 6.0) / game->viewport.height};
+	float offset[2] = {0.1521875 / 0.66 / 2.0 - 20 * data->counter / (60.0 * 6.0) / game->viewport.width * 0.66, -15 * data->counter / (60.0 * 6.0) / game->viewport.height * 0.66};
 	float scale[2] = {0.66, 0.66};
 
 	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
