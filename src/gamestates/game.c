@@ -144,6 +144,16 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 			data->woncount = 5.0;
 		}
 	}
+
+	if (data->x < -0.32) data->x = -0.32;
+	if (data->x > 1.32) data->x = 1.32;
+	if (data->y < -0.26) data->y = -0.26;
+	if (data->y > 1.26) data->y = 1.26;
+
+	if (data->x2 < -0.19) data->x2 = -0.19;
+	if (data->x2 > 1.19) data->x2 = 1.19;
+	if (data->y2 < -0.195) data->y2 = -0.195;
+	if (data->y2 > 1.195) data->y2 = 1.195;
 }
 
 void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
@@ -298,16 +308,6 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 
 		al_use_shader(NULL);
 	}
-
-	if (data->x < -0.32) data->x = -0.32;
-	if (data->x > 1.32) data->x = 1.32;
-	if (data->y < -0.26) data->y = -0.26;
-	if (data->y > 1.26) data->y = 1.26;
-
-	if (data->x2 < -0.19) data->x2 = -0.19;
-	if (data->x2 > 1.19) data->x2 = 1.19;
-	if (data->y2 < -0.195) data->y2 = -0.195;
-	if (data->y2 > 1.195) data->y2 = 1.195;
 }
 
 void Gamestate_ProcessEvent(struct Game* game, struct GamestateResources* data, ALLEGRO_EVENT* ev) {
