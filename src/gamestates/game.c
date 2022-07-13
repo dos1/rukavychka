@@ -54,22 +54,22 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 
 	data->lisek->flipY = false;
 	if (data->w) {
-		data->y -= delta / 3.0;
+		data->y -= delta * 1.777 / 4.0;
 		// SwitchSpritesheet(game, data->lisek, "walk2");
 		// data->lisek->flipY = false;
 	}
 	if (data->s) {
-		data->y += delta / 3.0;
+		data->y += delta * 1.777 / 4.0;
 		// SwitchSpritesheet(game, data->lisek, "walk2");
 		// data->lisek->flipY = true;
 	}
 	if (data->a) {
-		data->x -= delta / 3.0;
+		data->x -= delta / 4.0;
 		data->lisek->flipX = false;
 		data->lisek->flipY = false;
 	}
 	if (data->d) {
-		data->x += delta / 3.0;
+		data->x += delta / 4.0;
 		data->lisek->flipX = true;
 		data->lisek->flipY = false;
 	}
@@ -80,14 +80,18 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 		SwitchSpritesheet(game, data->lisek, "idle");
 	}
 
-	if (data->w2) { data->y2 -= delta / 3.0; }
-	if (data->s2) { data->y2 += delta / 3.0; }
+	if (data->w2) {
+		data->y2 -= delta * 1.777 / 4.0;
+	}
+	if (data->s2) {
+		data->y2 += delta * 1.777 / 4.0;
+	}
 	if (data->a2) {
-		data->x2 -= delta / 3.0;
+		data->x2 -= delta / 4.0;
 		data->smok->flipX = false;
 	}
 	if (data->d2) {
-		data->x2 += delta / 3.0;
+		data->x2 += delta / 4.0;
 		data->smok->flipX = true;
 	}
 
