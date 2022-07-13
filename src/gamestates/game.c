@@ -554,10 +554,10 @@ void Gamestate_Unload(struct Game* game, struct GamestateResources* data) {
 }
 
 void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
-	data->x = 0.2;
-	data->y = 0.55;
-	data->x2 = 0.65;
-	data->y2 = 0.55;
+	data->x = 0.3;
+	data->y = 0.6;
+	data->x2 = 0.7;
+	data->y2 = 0.6;
 	data->lisek->flipX = true;
 	SetCharacterPosition(game, data->myszka, 400, 70, 0.0);
 	data->myszka->scaleX = 0.5;
