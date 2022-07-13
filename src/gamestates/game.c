@@ -65,17 +65,11 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 	}
 	if (data->a) {
 		data->x -= delta / 3.0;
-		if (data->lisek->flipX) {
-			data->x += 0.12;
-		}
 		data->lisek->flipX = false;
 		data->lisek->flipY = false;
 	}
 	if (data->d) {
 		data->x += delta / 3.0;
-		if (!data->lisek->flipX) {
-			data->x -= 0.12;
-		}
 		data->lisek->flipX = true;
 		data->lisek->flipY = false;
 	}
@@ -90,16 +84,10 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 	if (data->s2) { data->y2 += delta / 3.0; }
 	if (data->a2) {
 		data->x2 -= delta / 3.0;
-		if (data->smok->flipX) {
-			data->x2 += 0.02;
-		}
 		data->smok->flipX = false;
 	}
 	if (data->d2) {
 		data->x2 += delta / 3.0;
-		if (!data->smok->flipX) {
-			data->x2 -= 0.02;
-		}
 		data->smok->flipX = true;
 	}
 
@@ -158,12 +146,12 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 	if (data->y2 > 1.195) data->y2 = 1.195;
 
 	if (data->found) {
-		int mx = GetCharacterX(game, data->myszka) + 45;
+		int mx = GetCharacterX(game, data->myszka);
 		int my = GetCharacterY(game, data->myszka);
-		int lx = GetCharacterX(game, data->lisek) + (data->lisek->flipX ? 420 : 230) - 60;
-		int ly = GetCharacterY(game, data->lisek) - 50;
-		int sx = GetCharacterX(game, data->smok) + 45 * (data->smok->flipX ? 1 : -1) - 50;
-		int sy = GetCharacterY(game, data->smok) + 50;
+		int lx = GetCharacterX(game, data->lisek);
+		int ly = GetCharacterY(game, data->lisek);
+		int sx = GetCharacterX(game, data->smok);
+		int sy = GetCharacterY(game, data->smok);
 
 		if (IsOnCharacter(game, data->lisek, mx, my, true)) {
 			bool connected = true;
@@ -200,7 +188,7 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 				if (mx != lx) {
 					data->myszka->flipX = mx < lx;
 				}
-				SetCharacterPosition(game, data->myszka, lx - 45, ly, 0);
+				SetCharacterPosition(game, data->myszka, lx, ly, 0);
 			}
 		}
 
@@ -239,7 +227,7 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 				if (mx != sx) {
 					data->myszka->flipX = mx < sx;
 				}
-				SetCharacterPosition(game, data->myszka, sx - 45, sy, 0);
+				SetCharacterPosition(game, data->myszka, sx, sy, 0);
 			}
 		}
 
@@ -572,7 +560,7 @@ void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 	data->lisek->scaleY = 0.64;
 	data->smok->scaleX = 0.6;
 	data->smok->scaleY = 0.6;
-	SetCharacterPosition(game, data->drzwi, 1050, 750, 0.0);
+	SetCharacterPosition(game, data->drzwi, 1080, 740, 0.0);
 	data->found = false;
 	data->won = false;
 	data->shown1 = false;
