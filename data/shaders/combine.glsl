@@ -30,7 +30,7 @@ vec3 convertHslToRgb(vec3 c) {
 
 void main() {
 	vec4 color = texture2D(al_tex, varying_texcoord);
-	vec4 tex_color = texture2D(tex, (varying_pos.xy / scale + 1.0) / 2.0 - offset * vec2(2.0, -2.0));
+	vec4 tex_color = texture2D(tex, (varying_pos.xy / scale + 1.0) / 2.0 - offset * vec2(1.0, -1.0));
 	vec3 sat = convertRgbToHsl(tex_color.rgb * color.a);
 	sat.y *= saturation;
 	sat.z *= brightness;
