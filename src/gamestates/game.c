@@ -156,48 +156,6 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 	if (data->x2 > 1.19) data->x2 = 1.19;
 	if (data->y2 < -0.195) data->y2 = -0.195;
 	if (data->y2 > 1.195) data->y2 = 1.195;
-}
-
-void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
-	al_set_target_bitmap(data->bg_anim2);
-	al_clear_to_color(al_map_rgba(255, 255, 255, 255));
-	al_draw_bitmap(data->bg2, 0, 0, 0);
-	if (!data->found)
-		DrawCharacter(game, data->myszka);
-
-	SetFramebufferAsTarget(game);
-	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
-
-	float scale[2] = {1.0, 1.0};
-	float offset[2] = {
-		sin(al_get_time() / 2.0) * 4.0 / 1920.0,
-		cos(al_get_time() / 2.9) * 3.0 / 1080.0,
-	};
-
-	al_use_shader(data->shader);
-	al_set_shader_sampler("tex", data->bg, 1);
-	al_set_shader_float_vector("offset", 2, offset, 1);
-	al_set_shader_float_vector("scale", 2, scale, 1);
-	al_set_shader_float("saturation", 1.2);
-	al_set_shader_float("brightness", 0.922);
-
-	SetCharacterPosition(game, data->lisek, 1920 * data->x, 1080 * data->y, 0);
-
-	if (data->shown1) {
-		DrawCharacter(game, data->lisek);
-	}
-
-	al_set_shader_sampler("tex", data->bg_anim2, 1);
-	SetCharacterPosition(game, data->smok, 1920 * data->x2, 1080 * data->y2, 0);
-	if (data->shown2) {
-		DrawCharacter(game, data->smok);
-	}
-
-	al_use_shader(NULL);
-	if (data->found) {
-		DrawCharacter(game, data->myszka);
-		// DrawCharacter(game, data->drzwi);
-	}
 
 	if (data->found) {
 		int mx = GetCharacterX(game, data->myszka) + 45;
@@ -289,6 +247,48 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 		if (GetCharacterY(game, data->myszka) <= 0) SetCharacterPosition(game, data->myszka, GetCharacterX(game, data->myszka), 1, 0);
 		if (GetCharacterX(game, data->myszka) >= 1920) SetCharacterPosition(game, data->myszka, 1919, GetCharacterY(game, data->myszka), 0);
 		if (GetCharacterY(game, data->myszka) >= 1080) SetCharacterPosition(game, data->myszka, GetCharacterX(game, data->myszka), 1079, 0);
+	}
+}
+
+void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
+	al_set_target_bitmap(data->bg_anim2);
+	al_clear_to_color(al_map_rgba(255, 255, 255, 255));
+	al_draw_bitmap(data->bg2, 0, 0, 0);
+	if (!data->found)
+		DrawCharacter(game, data->myszka);
+
+	SetFramebufferAsTarget(game);
+	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+
+	float scale[2] = {1.0, 1.0};
+	float offset[2] = {
+		sin(al_get_time() / 2.0) * 4.0 / 1920.0,
+		cos(al_get_time() / 2.9) * 3.0 / 1080.0,
+	};
+
+	al_use_shader(data->shader);
+	al_set_shader_sampler("tex", data->bg, 1);
+	al_set_shader_float_vector("offset", 2, offset, 1);
+	al_set_shader_float_vector("scale", 2, scale, 1);
+	al_set_shader_float("saturation", 1.2);
+	al_set_shader_float("brightness", 0.922);
+
+	SetCharacterPosition(game, data->lisek, 1920 * data->x, 1080 * data->y, 0);
+
+	if (data->shown1) {
+		DrawCharacter(game, data->lisek);
+	}
+
+	al_set_shader_sampler("tex", data->bg_anim2, 1);
+	SetCharacterPosition(game, data->smok, 1920 * data->x2, 1080 * data->y2, 0);
+	if (data->shown2) {
+		DrawCharacter(game, data->smok);
+	}
+
+	al_use_shader(NULL);
+	if (data->found) {
+		DrawCharacter(game, data->myszka);
+		// DrawCharacter(game, data->drzwi);
 	}
 
 	if (data->won) {
