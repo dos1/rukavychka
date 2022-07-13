@@ -52,23 +52,19 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 		}
 	}
 
-	SwitchSpritesheet(game, data->lisek, "idle");
 	data->lisek->flipY = false;
 	if (data->w) {
 		data->y -= delta / 3.0;
 		// SwitchSpritesheet(game, data->lisek, "walk2");
 		// data->lisek->flipY = false;
-		SwitchSpritesheet(game, data->lisek, "walk");
 	}
 	if (data->s) {
 		data->y += delta / 3.0;
 		// SwitchSpritesheet(game, data->lisek, "walk2");
 		// data->lisek->flipY = true;
-		SwitchSpritesheet(game, data->lisek, "walk");
 	}
 	if (data->a) {
 		data->x -= delta / 3.0;
-		SwitchSpritesheet(game, data->lisek, "walk");
 		if (data->lisek->flipX) {
 			data->x += 0.12;
 		}
@@ -77,12 +73,17 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 	}
 	if (data->d) {
 		data->x += delta / 3.0;
-		SwitchSpritesheet(game, data->lisek, "walk");
 		if (!data->lisek->flipX) {
 			data->x -= 0.12;
 		}
 		data->lisek->flipX = true;
 		data->lisek->flipY = false;
+	}
+
+	if (data->w || data->a || data->s || data->d) {
+		SwitchSpritesheet(game, data->lisek, "walk");
+	} else {
+		SwitchSpritesheet(game, data->lisek, "idle");
 	}
 
 	if (data->w2) { data->y2 -= delta / 3.0; }
@@ -104,11 +105,13 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 
 	if (data->show1 && !data->shown1) {
 		data->shown1 = true;
+		PrintConsole(game, "lisek visible");
 		al_rewind_audio_stream(data->player1);
 		al_set_audio_stream_playing(data->player1, true);
 	}
 	if (data->show2 && !data->shown2) {
 		data->shown2 = true;
+		PrintConsole(game, "smok visible");
 		al_rewind_audio_stream(data->player2);
 		al_set_audio_stream_playing(data->player2, true);
 	}
@@ -119,12 +122,13 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 	AnimateCharacter(game, data->drzwi, delta, 1.0);
 	AnimateCharacter(game, data->transition, delta, 1.0);
 
-	PrintConsole(game, "lisek: %f %f", GetCharacterX(game, data->lisek), GetCharacterY(game, data->lisek));
-	PrintConsole(game, "smok: %f %f", GetCharacterX(game, data->smok), GetCharacterY(game, data->smok));
+	// PrintConsole(game, "lisek: %f %f", GetCharacterX(game, data->lisek), GetCharacterY(game, data->lisek));
+	// PrintConsole(game, "smok: %f %f", GetCharacterX(game, data->smok), GetCharacterY(game, data->smok));
 
 	if (IsOnCharacter(game, data->lisek, GetCharacterX(game, data->drzwi), GetCharacterY(game, data->drzwi), true) &&
 		IsOnCharacter(game, data->smok, GetCharacterX(game, data->myszka), GetCharacterY(game, data->myszka), true)) {
 		if (!data->found) {
+			PrintConsole(game, "found!");
 			al_rewind_audio_stream(data->obj);
 			al_set_audio_stream_playing(data->obj, true);
 			data->found = true;
