@@ -296,6 +296,14 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 
 		al_use_shader(NULL);
 	}
+
+	/*
+	DrawDebugCharacter(game, data->myszka);
+	DrawDebugCharacter(game, data->drzwi);
+	DrawDebugCharacter(game, data->smok);
+	DrawDebugCharacter(game, data->lisek);
+	DrawDebugCharacter(game, data->transition);
+	*/
 }
 
 void Gamestate_ProcessEvent(struct Game* game, struct GamestateResources* data, ALLEGRO_EVENT* ev) {
@@ -551,7 +559,7 @@ void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 	data->x2 = 0.65;
 	data->y2 = 0.55;
 	data->lisek->flipX = true;
-	SetCharacterPosition(game, data->myszka, 360, 100, 0.0);
+	SetCharacterPosition(game, data->myszka, 400, 70, 0.0);
 	data->myszka->scaleX = 0.5;
 	data->myszka->scaleY = 0.5;
 	data->drzwi->scaleX = 0.5;
