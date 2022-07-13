@@ -1,5 +1,5 @@
-/*! \file empty.c
- *  \brief Empty gamestate.
+/*! \file holypangolin.c
+ *  \brief Rukavychka's Holy Pangolin logo.
  */
 /*
  * Copyright (c) Sebastian Krzyszkowiak <dos@dosowisko.net>

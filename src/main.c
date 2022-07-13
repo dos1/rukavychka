@@ -1,5 +1,5 @@
 /*! \file main.c
- *  \brief Main file of Super Examples.
+ *  \brief Main file of Rukavychka.
  */
 /*
  * Copyright (c) Sebastian Krzyszkowiak <dos@dosowisko.net>

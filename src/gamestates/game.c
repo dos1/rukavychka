@@ -1,5 +1,5 @@
-/*! \file example.c
- *  \brief Example gamestate.
+/*! \file game.c
+ *  \brief Rukavychka gameplay.
  */
 /*
  * Copyright (c) Sebastian Krzyszkowiak <dos@dosowisko.net>
