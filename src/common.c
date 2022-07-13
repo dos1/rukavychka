@@ -26,7 +26,7 @@ void Compositor(struct Game* game) {
 
 	if (al_get_time() - game->data->lasttime > 0.4) {
 		game->data->posx = rand() / (float)RAND_MAX * 880;
-		game->data->posy = rand() / (float)RAND_MAX * 1175;
+		game->data->posy = 120 + rand() / (float)RAND_MAX * 1050;
 		game->data->lasttime = al_get_time();
 	}
 
