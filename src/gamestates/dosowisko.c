@@ -95,6 +95,8 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 	data->underscore = Fract(game->time) >= 0.5;
 }
 
+void Gamestate_Tick(struct Game* game, struct GamestateResources* data) {}
+
 void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	if (!data->fadeout) {
 		char t[255] = "";
@@ -243,3 +245,6 @@ void Gamestate_Reload(struct Game* game, struct GamestateResources* data) {
 	data->pixelator = CreateNotPreservedBitmap(320, 180);
 	al_set_new_bitmap_flags(flags);
 }
+
+void Gamestate_Pause(struct Game* game, struct GamestateResources* data) {}
+void Gamestate_Resume(struct Game* game, struct GamestateResources* data) {}

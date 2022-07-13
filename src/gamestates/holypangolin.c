@@ -30,7 +30,6 @@ struct GamestateResources {
 	ALLEGRO_BITMAP* bg;
 	ALLEGRO_SHADER* shader;
 	double counter;
-	ALLEGRO_AUDIO_STREAM* monkeys;
 };
 
 int Gamestate_ProgressCount = 1;
@@ -72,11 +71,6 @@ void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
 	data->bmp = al_load_bitmap(GetDataFilePath(game, "holypangolin.png"));
 	progress(game); // report that we progressed with the loading, so the engine can draw a progress bar
 
-	data->monkeys = al_load_audio_stream(GetDataFilePath(game, "holypangolin.flac"), 4, 2048);
-	al_set_audio_stream_playing(data->monkeys, false);
-	al_attach_audio_stream_to_mixer(data->monkeys, game->audio.fx);
-	al_set_audio_stream_gain(data->monkeys, 0.75);
-
 	data->bg = al_load_bitmap(GetDataFilePath(game, "bg.jpg"));
 	data->shader = CreateShader(game, GetDataFilePath(game, "shaders/vertex.glsl"), GetDataFilePath(game, "shaders/combine.glsl"));
 
@@ -87,26 +81,16 @@ void Gamestate_Unload(struct Game* game, struct GamestateResources* data) {
 	al_destroy_bitmap(data->bmp);
 	al_destroy_bitmap(data->bg);
 	DestroyShader(game, data->shader);
-	al_destroy_audio_stream(data->monkeys);
 	free(data);
 }
 
 void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 	data->counter = 0;
-	al_rewind_audio_stream(data->monkeys);
-	// al_set_audio_stream_playing(data->monkeys, true);
-
 	al_play_sample_instance(game->data->sample_instance);
 }
 
-void Gamestate_Stop(struct Game* game, struct GamestateResources* data) {
-	al_set_audio_stream_playing(data->monkeys, false);
-}
+void Gamestate_Stop(struct Game* game, struct GamestateResources* data) {}
 
-void Gamestate_Pause(struct Game* game, struct GamestateResources* data) {
-	al_set_audio_stream_playing(data->monkeys, false);
-}
+void Gamestate_Pause(struct Game* game, struct GamestateResources* data) {}
 
-void Gamestate_Resume(struct Game* game, struct GamestateResources* data) {
-	// al_set_audio_stream_playing(data->monkeys, true);
-}
+void Gamestate_Resume(struct Game* game, struct GamestateResources* data) {}
