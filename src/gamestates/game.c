@@ -243,13 +243,15 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 }
 
 void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
-	al_set_target_bitmap(data->bg_anim2);
-	al_clear_to_color(al_map_rgba(255, 255, 255, 255));
-	al_draw_bitmap(data->bg2, 0, 0, 0);
-	if (!data->found)
-		DrawCharacter(game, data->myszka);
+	if (!data->found) {
+		al_set_target_bitmap(data->bg_anim2);
+		al_clear_to_color(al_map_rgba(255, 255, 255, 255));
+		al_draw_bitmap(data->bg2, 0, 0, 0);
+		if (!data->found)
+			DrawCharacter(game, data->myszka);
 
-	SetFramebufferAsTarget(game);
+		SetFramebufferAsTarget(game);
+	}
 	ClearToColor(game, al_map_rgba(255, 255, 255, 255));
 
 	float scale[2] = {1.0, 1.0};
@@ -271,7 +273,7 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 		DrawCharacter(game, data->lisek);
 	}
 
-	al_set_shader_sampler("tex", data->bg_anim2, 1);
+	al_set_shader_sampler("tex", data->found ? data->bg2 : data->bg_anim2, 1);
 	SetCharacterPosition(game, data->smok, 1920 * data->x2, 1080 * data->y2, 0);
 	if (data->shown2) {
 		DrawCharacter(game, data->smok);
