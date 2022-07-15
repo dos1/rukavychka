@@ -250,7 +250,7 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 		DrawCharacter(game, data->myszka);
 
 	SetFramebufferAsTarget(game);
-	al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+	ClearToColor(game, al_map_rgba(255, 255, 255, 255));
 
 	float scale[2] = {1.0, 1.0};
 	float offset[2] = {

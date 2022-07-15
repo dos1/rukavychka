@@ -21,47 +21,6 @@
 #include "common.h"
 #include <libsuperderpy.h>
 
-void Compositor(struct Game* game) {
-	struct Gamestate* tmp = GetNextGamestate(game, NULL);
-
-	if (al_get_time() - game->data->lasttime > 0.4) {
-		game->data->posx = rand() / (float)RAND_MAX * 880;
-		game->data->posy = 120 + rand() / (float)RAND_MAX * 1050;
-		game->data->lasttime = al_get_time();
-	}
-
-	ClearToColor(game, al_map_rgb(255, 255, 255));
-
-	ALLEGRO_COLOR tint = al_map_rgba_f(1.0, 1.0, 1.0, 1.0);
-
-	if (game->loading.shown) {
-		al_draw_tinted_bitmap(GetGamestateFramebuffer(game, GetGamestate(game, NULL)), tint, game->clip_rect.x, game->clip_rect.y, 0);
-		tmp = NULL;
-	}
-
-	while (tmp) {
-		if (IsGamestateVisible(game, tmp)) {
-			al_draw_tinted_bitmap(GetGamestateFramebuffer(game, tmp), tint, game->clip_rect.x, game->clip_rect.y, 0);
-		}
-		tmp = GetNextGamestate(game, tmp);
-	}
-
-	al_use_shader(game->data->shader);
-	al_set_clipping_rectangle(game->clip_rect.x, game->clip_rect.y - game->clip_rect.h * 0.05555, game->clip_rect.w, game->clip_rect.h * 1.1111);
-	al_draw_scaled_bitmap(game->data->tex, 0, 0, al_get_bitmap_width(game->data->tex), al_get_bitmap_height(game->data->tex),
-		game->clip_rect.x - game->data->posx / 1920.0 * (double)game->clip_rect.w, game->clip_rect.y - game->data->posy / 1920.0 * (double)game->clip_rect.h,
-		al_get_bitmap_width(game->data->tex) / 1920.0 * (double)game->clip_rect.w * 0.4,
-		al_get_bitmap_height(game->data->tex) / 1080.0 * (double)game->clip_rect.h * 0.4, 0);
-	al_reset_clipping_rectangle();
-	al_use_shader(NULL);
-
-	if (game->data->won) {
-		double col = 1.0 - pow(al_get_sample_instance_gain(game->data->sample_instance) / 0.32, 0.5);
-		al_draw_filled_rectangle(0, 0, al_get_display_width(game->display), al_get_display_height(game->display),
-			al_map_rgba_f(0, 0, 0, col));
-	}
-}
-
 bool GlobalEventHandler(struct Game* game, ALLEGRO_EVENT* ev) {
 	if ((ev->type == ALLEGRO_EVENT_KEY_DOWN) && (ev->keyboard.keycode == ALLEGRO_KEY_M)) {
 		ToggleMute(game);
@@ -84,6 +43,29 @@ void PreLogic(struct Game* game, double delta) {
 		al_set_sample_instance_gain(game->data->sample_instance, fmax(0.00, al_get_sample_instance_gain(game->data->sample_instance) - delta / 16.0));
 	} else {
 		al_set_sample_instance_gain(game->data->sample_instance, fmin(0.32, al_get_sample_instance_gain(game->data->sample_instance) + delta / 8.0));
+	}
+}
+
+void PostDraw(struct Game* game) {
+	if (al_get_time() - game->data->lasttime > 0.4) {
+		game->data->posx = rand() / (float)RAND_MAX * 880;
+		game->data->posy = 120 + rand() / (float)RAND_MAX * 1050;
+		game->data->lasttime = al_get_time();
+	}
+
+	al_use_shader(game->data->shader);
+	al_set_clipping_rectangle(game->clip_rect.x, game->clip_rect.y - game->clip_rect.h * 0.05555, game->clip_rect.w, game->clip_rect.h * 1.1111);
+	al_draw_scaled_bitmap(game->data->tex, 0, 0, al_get_bitmap_width(game->data->tex), al_get_bitmap_height(game->data->tex),
+		game->clip_rect.x - game->data->posx / 1920.0 * (double)game->clip_rect.w, game->clip_rect.y - game->data->posy / 1920.0 * (double)game->clip_rect.h,
+		al_get_bitmap_width(game->data->tex) / 1920.0 * (double)game->clip_rect.w * 0.4,
+		al_get_bitmap_height(game->data->tex) / 1080.0 * (double)game->clip_rect.h * 0.4, 0);
+	al_reset_clipping_rectangle();
+	al_use_shader(NULL);
+
+	if (game->data->won) {
+		double col = 1.0 - pow(al_get_sample_instance_gain(game->data->sample_instance) / 0.32, 0.5);
+		al_draw_filled_rectangle(0, 0, al_get_display_width(game->display), al_get_display_height(game->display),
+			al_map_rgba_f(0, 0, 0, col));
 	}
 }
 

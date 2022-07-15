@@ -44,10 +44,12 @@ int main(int argc, char** argv) {
 			.handlers = {
 				.event = GlobalEventHandler,
 				.destroy = DestroyGameData,
-				.compositor = Compositor,
 				.prelogic = PreLogic,
+				.postdraw = PostDraw,
 			},
-			.show_loading_on_launch = true});
+			.show_loading_on_launch = true,
+			.disable_bg_clear = true,
+		});
 	if (!game) { return 1; }
 
 	SetBackgroundColor(game, al_map_rgb(255, 255, 255));

@@ -29,8 +29,8 @@ struct CommonResources {
 	bool won;
 };
 
-void Compositor(struct Game* game);
 struct CommonResources* CreateGameData(struct Game* game);
 void DestroyGameData(struct Game* game);
 bool GlobalEventHandler(struct Game* game, ALLEGRO_EVENT* ev);
 void PreLogic(struct Game* game, double delta);
+void PostDraw(struct Game* game);
