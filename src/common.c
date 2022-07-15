@@ -57,8 +57,8 @@ void PostDraw(struct Game* game) {
 	al_set_clipping_rectangle(game->clip_rect.x, game->clip_rect.y - game->clip_rect.h * 0.05555, game->clip_rect.w, game->clip_rect.h * 1.1111);
 	al_draw_scaled_bitmap(game->data->tex, 0, 0, al_get_bitmap_width(game->data->tex), al_get_bitmap_height(game->data->tex),
 		game->clip_rect.x - game->data->posx / 1920.0 * (double)game->clip_rect.w, game->clip_rect.y - game->data->posy / 1920.0 * (double)game->clip_rect.h,
-		al_get_bitmap_width(game->data->tex) / 1920.0 * (double)game->clip_rect.w * 0.4,
-		al_get_bitmap_height(game->data->tex) / 1080.0 * (double)game->clip_rect.h * 0.4, 0);
+		al_get_bitmap_width(game->data->tex) / 1920.0 * (double)game->clip_rect.w * 0.5,
+		al_get_bitmap_height(game->data->tex) / 1080.0 * (double)game->clip_rect.h * 0.5, 0);
 	al_reset_clipping_rectangle();
 	al_use_shader(NULL);
 
