@@ -107,7 +107,7 @@ sudo apt install libgles2-mesa-dev # for OpenGL ES on X11
 
 ## License
 
-The game is available under the terms of [GNU General Public License 3.0](COPYING) or later.
+The game's source code is available under the terms of [GNU General Public License 3.0](COPYING) or later. This license *does not* cover graphical assets.
 
 ## Contributing
 
