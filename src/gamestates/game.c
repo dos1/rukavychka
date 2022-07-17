@@ -119,8 +119,8 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 	// PrintConsole(game, "lisek: %f %f", GetCharacterX(game, data->lisek), GetCharacterY(game, data->lisek));
 	// PrintConsole(game, "smok: %f %f", GetCharacterX(game, data->smok), GetCharacterY(game, data->smok));
 
-	if (IsOnCharacter(game, data->lisek, GetCharacterX(game, data->drzwi), GetCharacterY(game, data->drzwi), true) &&
-		IsOnCharacter(game, data->smok, GetCharacterX(game, data->myszka), GetCharacterY(game, data->myszka), true)) {
+	if (Distance(GetCharacterX(game, data->drzwi), GetCharacterY(game, data->drzwi), GetCharacterX(game, data->lisek), GetCharacterY(game, data->lisek)) <= 120 &&
+		Distance(GetCharacterX(game, data->myszka), GetCharacterY(game, data->myszka), GetCharacterX(game, data->smok), GetCharacterY(game, data->smok)) <= 120) {
 		if (!data->found) {
 			PrintConsole(game, "found!");
 			al_rewind_audio_stream(data->obj);
