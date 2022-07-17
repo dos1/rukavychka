@@ -32,8 +32,7 @@ struct GamestateResources {
 	bool w, s, a, d;
 	bool w2, s2, a2, d2;
 
-	bool show1, shown1;
-	bool show2, shown2;
+	bool show1, show2;
 	ALLEGRO_AUDIO_STREAM *player1, *player2, *obj, *win;
 	double woncount;
 
@@ -95,14 +94,15 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 		data->smok->flipX = true;
 	}
 
-	if (data->show1 && !data->shown1) {
-		data->shown1 = true;
+	if (data->show1 && IsCharacterHidden(game, data->lisek)) {
+		ShowCharacter(game, data->lisek);
 		PrintConsole(game, "lisek visible");
 		al_rewind_audio_stream(data->player1);
 		al_set_audio_stream_playing(data->player1, true);
 	}
-	if (data->show2 && !data->shown2) {
-		data->shown2 = true;
+
+	if (data->show2 && IsCharacterHidden(game, data->smok)) {
+		ShowCharacter(game, data->smok);
 		PrintConsole(game, "smok visible");
 		al_rewind_audio_stream(data->player2);
 		al_set_audio_stream_playing(data->player2, true);
@@ -255,15 +255,10 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	al_set_shader_float_vector("scale", 2, scale, 1);
 	al_set_shader_float("saturation", 1.2);
 	al_set_shader_float("brightness", 0.922);
-
-	if (data->shown1) {
-		DrawCharacter(game, data->lisek);
-	}
+	DrawCharacter(game, data->lisek);
 
 	al_set_shader_sampler("tex", data->found ? data->bg2 : data->bg_anim2, 1);
-	if (data->shown2) {
-		DrawCharacter(game, data->smok);
-	}
+	DrawCharacter(game, data->smok);
 
 	al_use_shader(NULL);
 	if (data->found) {
@@ -552,6 +547,8 @@ void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 	SetCharacterPositionF(game, data->smok, 0.7, 0.6, 0);
 	SetCharacterPosition(game, data->myszka, 400, 70, 0.0);
 	SetCharacterPosition(game, data->drzwi, 1090, 740, 0.0);
+	HideCharacter(game, data->lisek);
+	HideCharacter(game, data->smok);
 	data->myszka->scaleX = 0.5;
 	data->myszka->scaleY = 0.5;
 	data->drzwi->scaleX = 0.3;
@@ -563,8 +560,6 @@ void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 	data->smok->scaleY = 0.6;
 	data->found = false;
 	data->won = false;
-	data->shown1 = false;
-	data->shown2 = false;
 }
 
 void Gamestate_Stop(struct Game* game, struct GamestateResources* data) {}
