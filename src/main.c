@@ -48,7 +48,6 @@ int main(int argc, char** argv) {
 				.postdraw = PostDraw,
 			},
 			.show_loading_on_launch = true,
-			.disable_bg_clear = true,
 		});
 	if (!game) { return 1; }
 

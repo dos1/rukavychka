@@ -242,18 +242,17 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 	}
 }
 
-void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
+void Gamestate_PreDraw(struct Game* game, struct GamestateResources* data) {
 	if (!data->found) {
 		al_set_target_bitmap(data->bg_anim2);
 		al_clear_to_color(al_map_rgba(255, 255, 255, 255));
 		al_draw_bitmap(data->bg2, 0, 0, 0);
 		if (!data->found)
 			DrawCharacter(game, data->myszka);
-
-		SetFramebufferAsTarget(game);
 	}
-	ClearToColor(game, al_map_rgba(255, 255, 255, 255));
+}
 
+void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	float scale[2] = {1.0, 1.0};
 	float offset[2] = {
 		sin(al_get_time() / 2.0) * 4.0 / 1920.0,

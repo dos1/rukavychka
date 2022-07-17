@@ -45,7 +45,6 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	float offset[2] = {0.1521875 / 0.66 - 20 * data->counter / (60.0 * 6.0) / game->viewport.width * 0.66 * 2.0, -15 * data->counter / (60.0 * 6.0) / game->viewport.height * 0.66 * 2.0};
 	float scale[2] = {0.66, 0.66};
 
-	ClearToColor(game, al_map_rgba(255, 255, 255, 255));
 	al_use_shader(data->shader);
 	al_set_shader_sampler("tex", data->bg, 1);
 	al_set_shader_float_vector("offset", 2, offset, 1);

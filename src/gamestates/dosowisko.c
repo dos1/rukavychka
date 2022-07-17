@@ -97,7 +97,7 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 
 void Gamestate_Tick(struct Game* game, struct GamestateResources* data) {}
 
-void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
+void Gamestate_PreDraw(struct Game* game, struct GamestateResources* data) {
 	if (!data->fadeout) {
 		char t[255] = "";
 		strncpy(t, data->text, 255);
@@ -129,11 +129,11 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 			0);
 
 		al_draw_bitmap(data->checkerboard, 0, 0, 0);
-
-		SetFramebufferAsTarget(game);
-
-		al_draw_scaled_bitmap(data->pixelator, 0, 0, 320, 180, 0, 0, game->viewport.width, game->viewport.height, 0);
 	}
+}
+
+void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
+	al_draw_scaled_bitmap(data->pixelator, 0, 0, 320, 180, 0, 0, game->viewport.width, game->viewport.height, 0);
 }
 
 void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
