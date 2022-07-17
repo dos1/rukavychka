@@ -30,9 +30,7 @@ struct GamestateResources {
 	ALLEGRO_BITMAP *bg_anim2, *mask1, *mask2, *koniec;
 
 	bool w, s, a, d;
-	double x, y;
 	bool w2, s2, a2, d2;
-	double x2, y2;
 
 	bool show1, shown1;
 	bool show2, shown2;
@@ -56,22 +54,22 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 
 	data->lisek->flipY = false;
 	if (data->w) {
-		data->y -= delta * 1.777 / 4.0;
+		MoveCharacterF(game, data->lisek, 0, -delta * 1.777 / 4.0, 0);
 		// SwitchSpritesheet(game, data->lisek, "walk2");
 		// data->lisek->flipY = false;
 	}
 	if (data->s) {
-		data->y += delta * 1.777 / 4.0;
+		MoveCharacterF(game, data->lisek, 0, delta * 1.777 / 4.0, 0);
 		// SwitchSpritesheet(game, data->lisek, "walk2");
 		// data->lisek->flipY = true;
 	}
 	if (data->a) {
-		data->x -= delta / 4.0;
+		MoveCharacterF(game, data->lisek, -delta / 4.0, 0, 0);
 		data->lisek->flipX = false;
 		data->lisek->flipY = false;
 	}
 	if (data->d) {
-		data->x += delta / 4.0;
+		MoveCharacterF(game, data->lisek, delta / 4.0, 0, 0);
 		data->lisek->flipX = true;
 		data->lisek->flipY = false;
 	}
@@ -83,17 +81,17 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 	}
 
 	if (data->w2) {
-		data->y2 -= delta * 1.777 / 4.0;
+		MoveCharacterF(game, data->smok, 0, -delta * 1.777 / 4.0, 0);
 	}
 	if (data->s2) {
-		data->y2 += delta * 1.777 / 4.0;
+		MoveCharacterF(game, data->smok, 0, delta * 1.777 / 4.0, 0);
 	}
 	if (data->a2) {
-		data->x2 -= delta / 4.0;
+		MoveCharacterF(game, data->smok, -delta / 4.0, 0, 0);
 		data->smok->flipX = false;
 	}
 	if (data->d2) {
-		data->x2 += delta / 4.0;
+		MoveCharacterF(game, data->smok, delta / 4.0, 0, 0);
 		data->smok->flipX = true;
 	}
 
@@ -140,16 +138,6 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 			data->woncount = 5.0;
 		}
 	}
-
-	if (data->x < -0.23) data->x = -0.23;
-	if (data->x > 1.25) data->x = 1.25;
-	if (data->y < -0.32) data->y = -0.32;
-	if (data->y > 1.21) data->y = 1.21;
-
-	if (data->x2 < -0.19) data->x2 = -0.19;
-	if (data->x2 > 1.19) data->x2 = 1.19;
-	if (data->y2 < -0.16) data->y2 = -0.16;
-	if (data->y2 > 1.25) data->y2 = 1.25;
 
 	if (data->found) {
 		int mx = GetCharacterX(game, data->myszka);
@@ -268,14 +256,11 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	al_set_shader_float("saturation", 1.2);
 	al_set_shader_float("brightness", 0.922);
 
-	SetCharacterPosition(game, data->lisek, 1920 * data->x, 1080 * data->y, 0);
-
 	if (data->shown1) {
 		DrawCharacter(game, data->lisek);
 	}
 
 	al_set_shader_sampler("tex", data->found ? data->bg2 : data->bg_anim2, 1);
-	SetCharacterPosition(game, data->smok, 1920 * data->x2, 1080 * data->y2, 0);
 	if (data->shown2) {
 		DrawCharacter(game, data->smok);
 	}
@@ -561,11 +546,10 @@ void Gamestate_Unload(struct Game* game, struct GamestateResources* data) {
 }
 
 void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
-	data->x = 0.3;
-	data->y = 0.6;
-	data->x2 = 0.7;
-	data->y2 = 0.6;
-	data->lisek->flipX = true;
+	SetCharacterBoundsF(game, data->lisek, -0.23, -0.32, 1.25, 1.21);
+	SetCharacterBoundsF(game, data->smok, -0.19, -0.16, 1.19, 1.25);
+	SetCharacterPositionF(game, data->lisek, 0.3, 0.6, 0);
+	SetCharacterPositionF(game, data->smok, 0.7, 0.6, 0);
 	SetCharacterPosition(game, data->myszka, 400, 70, 0.0);
 	SetCharacterPosition(game, data->drzwi, 1090, 740, 0.0);
 	data->myszka->scaleX = 0.5;
@@ -574,6 +558,7 @@ void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 	data->drzwi->scaleY = 0.8;
 	data->lisek->scaleX = 0.64;
 	data->lisek->scaleY = 0.64;
+	data->lisek->flipX = true;
 	data->smok->scaleX = 0.6;
 	data->smok->scaleY = 0.6;
 	data->found = false;
