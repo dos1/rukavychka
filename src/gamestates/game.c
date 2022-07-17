@@ -22,6 +22,7 @@
 #include <libsuperderpy.h>
 
 #define MAX_DISTANCE 80
+#define TOUCH_DISTANCE 160
 
 struct GamestateResources {
 	ALLEGRO_BITMAP *bg, *bg2;
@@ -39,6 +40,8 @@ struct GamestateResources {
 	struct Character *lisek, *smok, *myszka, *drzwi, *transition;
 
 	bool found, won;
+
+	int touch1, touch2;
 };
 
 int Gamestate_ProgressCount = 18;
@@ -81,7 +84,7 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 		data->lisek->flipY = false;
 	}
 
-	if (data->w || data->a || data->s || data->d) {
+	if (data->w || data->a || data->s || data->d || data->touch1 != -1) {
 		SwitchSpritesheet(game, data->lisek, "walk");
 	} else {
 		SwitchSpritesheet(game, data->lisek, "idle");
@@ -439,16 +442,57 @@ void Gamestate_ProcessEvent(struct Game* game, struct GamestateResources* data, 
 			}
 		}
 	}
-	/*
-	if ((ev->type == ALLEGRO_EVENT_KEY_DOWN) && (ev->keyboard.keycode == ALLEGRO_KEY_SPACE)) {
-		al_rewind_audio_stream(data->win);
-		al_set_audio_stream_playing(data->win, true);
-		SetCharacterPosition(game, data->transition, GetCharacterX(game, data->drzwi) + 60, GetCharacterY(game, data->drzwi), 0);
-		SelectSpritesheet(game, data->transition, "mikro_max");
-		data->won = true;
-		data->woncount = 5.0;
+
+	if (ev->type == ALLEGRO_EVENT_TOUCH_BEGIN) {
+		if (IsCharacterHidden(game, data->lisek)) {
+			data->show1 = true;
+		} else if (IsCharacterHidden(game, data->smok)) {
+			data->show2 = true;
+		} else {
+			double x = Clamp(0, 1, (ev->touch.x - game->clip_rect.x) / (double)game->clip_rect.w);
+			double y = Clamp(0, 1, (ev->touch.y - game->clip_rect.y) / (double)game->clip_rect.h);
+			if (Distance(x * game->viewport.width, y * game->viewport.height,
+						GetCharacterX(game, data->smok), GetCharacterY(game, data->smok)) <= TOUCH_DISTANCE) {
+				data->touch2 = ev->touch.id;
+			} else if (Distance(x * game->viewport.width, y * game->viewport.height,
+									 GetCharacterX(game, data->lisek), GetCharacterY(game, data->lisek)) <= TOUCH_DISTANCE) {
+				data->touch1 = ev->touch.id;
+			}
+		}
 	}
-	*/
+
+	if (ev->type == ALLEGRO_EVENT_TOUCH_MOVE) {
+		if (ev->touch.id == data->touch2) {
+			double x = ev->touch.dx / (double)game->clip_rect.w;
+			double y = ev->touch.dy / (double)game->clip_rect.h;
+			MoveCharacterF(game, data->smok, x, y, 0);
+			data->smok->flipX = x > 0;
+		}
+		if (ev->touch.id == data->touch1) {
+			double x = ev->touch.dx / (double)game->clip_rect.w;
+			double y = ev->touch.dy / (double)game->clip_rect.h;
+			MoveCharacterF(game, data->lisek, x, y, 0);
+			data->lisek->flipX = x > 0;
+		}
+	}
+
+	if (ev->type == ALLEGRO_EVENT_TOUCH_END || ev->type == ALLEGRO_EVENT_TOUCH_CANCEL) {
+		if (ev->touch.id == data->touch2) {
+			data->touch2 = -1;
+		}
+		if (ev->touch.id == data->touch1) {
+			data->touch1 = -1;
+		}
+	}
+
+	if (ev->type == ALLEGRO_EVENT_TOUCH_MOVE) {
+		SetCharacterBoundsF(game, data->lisek, 0, 0, 1, 1);
+		SetCharacterBoundsF(game, data->smok, 0, 0, 1, 1);
+	}
+	if (ev->type == ALLEGRO_EVENT_KEY_DOWN) {
+		SetCharacterBoundsF(game, data->lisek, -0.23, -0.32, 1.25, 1.21);
+		SetCharacterBoundsF(game, data->smok, -0.19, -0.16, 1.19, 1.25);
+	}
 }
 
 void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
@@ -549,8 +593,6 @@ void Gamestate_Unload(struct Game* game, struct GamestateResources* data) {
 }
 
 void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
-	SetCharacterBoundsF(game, data->lisek, -0.23, -0.32, 1.25, 1.21);
-	SetCharacterBoundsF(game, data->smok, -0.19, -0.16, 1.19, 1.25);
 	SetCharacterPositionF(game, data->lisek, 0.3, 0.6, 0);
 	SetCharacterPositionF(game, data->smok, 0.7, 0.6, 0);
 	SetCharacterPosition(game, data->myszka, 400, 70, 0.0);
@@ -569,6 +611,8 @@ void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 	data->found = false;
 	data->won = false;
 	data->counter = 0.0;
+	data->touch1 = -1;
+	data->touch2 = -1;
 }
 
 void Gamestate_Stop(struct Game* game, struct GamestateResources* data) {}
