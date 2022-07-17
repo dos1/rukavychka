@@ -55,7 +55,7 @@ To run Rukavychka after building the flatpak, issue this command:
 flatpak run com.holypangolin.Rukavychka
 ```
 
-The game depends on the Freedesktop SDK 19.08. If Flatpak doesn't offer to install it automatically when building, make sure you have some repository that contains it enabled, for instance Flathub:
+The game depends on the Freedesktop SDK 21.08. If Flatpak doesn't offer to install it automatically when building, make sure you have some repository that contains it enabled, for instance Flathub:
 
 ```
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
