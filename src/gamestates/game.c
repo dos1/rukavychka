@@ -34,7 +34,7 @@ struct GamestateResources {
 
 	bool show1, show2;
 	ALLEGRO_AUDIO_STREAM *player1, *player2, *obj, *win;
-	double woncount;
+	double counter, woncount;
 
 	struct Character *lisek, *smok, *myszka, *drzwi, *transition;
 
@@ -49,6 +49,14 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 		if (data->woncount < 0.0) {
 			game->data->won = true;
 		}
+	}
+
+	data->counter += delta;
+	if (data->counter > 15) {
+		data->show1 = true;
+	}
+	if (data->counter > 25) {
+		data->show2 = true;
 	}
 
 	data->lisek->flipY = false;
@@ -560,6 +568,7 @@ void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 	data->smok->scaleY = 0.6;
 	data->found = false;
 	data->won = false;
+	data->counter = 0.0;
 }
 
 void Gamestate_Stop(struct Game* game, struct GamestateResources* data) {}
