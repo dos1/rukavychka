@@ -48,13 +48,13 @@ void PreLogic(struct Game* game, double delta) {
 
 void PostDraw(struct Game* game) {
 	if (al_get_time() - game->data->lasttime > 0.4) {
-		game->data->posx = rand() / (float)RAND_MAX * 880;
+		game->data->posx = 120 + rand() / (float)RAND_MAX * 640;
 		game->data->posy = 120 + rand() / (float)RAND_MAX * 1050;
 		game->data->lasttime = al_get_time();
 	}
 
 	al_use_shader(game->data->shader);
-	al_set_clipping_rectangle(game->clip_rect.x, game->clip_rect.y - game->clip_rect.h * 0.05555, game->clip_rect.w, game->clip_rect.h * 1.1111);
+	al_set_clipping_rectangle(game->clip_rect.x - game->clip_rect.w * 0.0625, game->clip_rect.y - game->clip_rect.h * 0.05555, game->clip_rect.w * 1.125, game->clip_rect.h * 1.1111);
 	al_draw_scaled_bitmap(game->data->tex, 0, 0, al_get_bitmap_width(game->data->tex), al_get_bitmap_height(game->data->tex),
 		game->clip_rect.x - game->data->posx / 1920.0 * (double)game->clip_rect.w, game->clip_rect.y - game->data->posy / 1920.0 * (double)game->clip_rect.h,
 		al_get_bitmap_width(game->data->tex) / 1920.0 * (double)game->clip_rect.w * 0.5,
