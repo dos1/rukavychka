@@ -21,6 +21,8 @@
 #include "../common.h"
 #include <libsuperderpy.h>
 
+#define MAX_DISTANCE 80
+
 struct GamestateResources {
 	ALLEGRO_BITMAP *bg, *bg2;
 	ALLEGRO_SHADER* shader;
@@ -157,7 +159,7 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 		int sx = GetCharacterX(game, data->smok);
 		int sy = GetCharacterY(game, data->smok);
 
-		if (IsOnCharacter(game, data->lisek, mx, my, true)) {
+		if (IsOnCharacter(game, data->lisek, mx, my, false)) {
 			bool connected = true;
 
 			double a = my - ly;
@@ -188,7 +190,7 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 				}
 			}
 
-			if (connected) {
+			if (connected && Distance(mx, my, lx, ly) <= MAX_DISTANCE) {
 				if (mx != lx) {
 					data->myszka->flipX = mx < lx;
 				}
@@ -196,7 +198,7 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 			}
 		}
 
-		if (IsOnCharacter(game, data->smok, mx, my, true)) {
+		if (IsOnCharacter(game, data->smok, mx, my, false)) {
 			bool connected = true;
 
 			double a = my - sy;
@@ -227,7 +229,7 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 				}
 			}
 
-			if (connected) {
+			if (connected && Distance(mx, my, sx, sy) <= MAX_DISTANCE) {
 				if (mx != sx) {
 					data->myszka->flipX = mx < sx;
 				}
