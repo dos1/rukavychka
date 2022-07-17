@@ -129,12 +129,12 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 		}
 	}
 
-	if (IsOnCharacter(game, data->drzwi, GetCharacterX(game, data->myszka) + 60, GetCharacterY(game, data->myszka), false)) {
+	if (IsOnCharacter(game, data->drzwi, GetCharacterX(game, data->myszka), GetCharacterY(game, data->myszka), false)) {
 		if (!data->won) {
 			PrintConsole(game, "WON");
 			al_rewind_audio_stream(data->win);
 			al_set_audio_stream_playing(data->win, true);
-			SetCharacterPosition(game, data->transition, GetCharacterX(game, data->myszka) + 60, GetCharacterY(game, data->myszka), 0);
+			SetCharacterPosition(game, data->transition, GetCharacterX(game, data->myszka), GetCharacterY(game, data->myszka), 0);
 			SelectSpritesheet(game, data->transition, "mikro_max");
 			data->won = true;
 			data->woncount = 5.0;
@@ -570,8 +570,8 @@ void Gamestate_Start(struct Game* game, struct GamestateResources* data) {
 	SetCharacterPosition(game, data->drzwi, 1090, 740, 0.0);
 	data->myszka->scaleX = 0.5;
 	data->myszka->scaleY = 0.5;
-	data->drzwi->scaleX = 0.5;
-	data->drzwi->scaleY = 0.5;
+	data->drzwi->scaleX = 0.3;
+	data->drzwi->scaleY = 0.8;
 	data->lisek->scaleX = 0.64;
 	data->lisek->scaleY = 0.64;
 	data->smok->scaleX = 0.6;
