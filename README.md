@@ -1,5 +1,27 @@
 # Rukavychka
 
+![Wawel Dragon](data/smok.gif)
+
+Find the mouse (with dragon) and the door to Rukavychka (with fox) together, then lead the mouse to the door.
+
+The mouse can walk only on the plants within the fox or the dragon and will stop in front of gaps.
+
+The dragon and the fox are in 2 different worlds, but in the end everyone will be joined together.
+
+[Play now on itch.io!](https://holypangolin.itch.io/rukavychka)
+
+## Controls
+
+Keyboard: **WSAD** (Ukrainian fox) & **ARROWS** (Polish Wawel dragon); or touchscreen.
+
+## Inspiration & meaning
+
+The game was inspired by Ukrainian legend of Rukavychka (glove) - in which an old man lost a glove, which came to be a home for many forest animals big and small: from a little mouse to a huge bear. In the story, the old man takes the glove back, but we imagine a story where the animals can live safely in the magical home. They are lost and we have to lead them to it by a fox from the Ukrainian story, and Wawel Dragon from Polish legends, to unify our nations by social cooperation, and unfold/bring safe future for everyone (including forest beings that also need peace to exist).
+
+We developed the first level, in which you lead a little mouse to magical rukavychka.
+
+We were inspired by traditional floral patterns for the backgrounds (made by watercolors and ink). We also focused on colors from Ukrainian flag (yellow and blue shades, with a bit of green for the leaves) and important Ukrainian flowers like sunflower or Vinca species.
+
 ## Cloning the repository
 
 As Rukavychka uses git submodules, make sure to initialize them before trying to compile:
@@ -107,8 +129,14 @@ sudo apt install libgles2-mesa-dev # for OpenGL ES on X11
 
 ## License
 
-The game's source code is available under the terms of [GNU General Public License 3.0](COPYING) or later. This license *does not* cover graphical assets.
+The game's source code is available under the terms of [GNU General Public License 3.0](COPYING) or later.
+
+The game's art assets are available under the terms of [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
 ## Contributing
 
 Rukavychka uses the libsuperderpy's code style guide: [libsuperderpy/README_codestyle.md](https://gitlab.com/dosowisko.net/libsuperderpy/blob/master/README_codestyle.md).
+
+## Made by
+
+Agata Nawrot and Sebastian Krzyszkowiak for *United with Ukraine Game Jam 2022*.
