@@ -496,7 +496,7 @@ void Gamestate_ProcessEvent(struct Game* game, struct GamestateResources* data, 
 		SetCharacterBoundsF(game, data->lisek, 0, 0, 1, 1);
 		SetCharacterBoundsF(game, data->smok, 0, 0, 1, 1);
 	}
-	if (ev->type == ALLEGRO_EVENT_KEY_DOWN) {
+	if (ev->type == ALLEGRO_EVENT_KEY_DOWN || ev->type == ALLEGRO_EVENT_JOYSTICK_AXIS) {
 		SetCharacterBoundsF(game, data->lisek, -0.23, -0.32, 1.25, 1.21);
 		SetCharacterBoundsF(game, data->smok, -0.19, -0.16, 1.19, 1.25);
 	}
