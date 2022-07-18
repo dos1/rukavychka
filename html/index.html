@@ -128,6 +128,15 @@
 
     <script type='text/javascript'>
 
+      // don't allow to hijack wheel events
+
+      Element.prototype._addEventListener = Element.prototype.addEventListener;
+
+      Element.prototype.addEventListener = function(name) {
+         if (name=="wheel") return;
+         this._addEventListener.apply(this, arguments);
+      };
+
       // for correct focus/blur handling in iframes (otherwise canvas eats the events and the engine stays paused)
       window.addEventListener('focus', function() {
         document.querySelector('.blocker').classList.remove('active');
