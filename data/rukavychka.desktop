@@ -7,3 +7,4 @@ Comment=Lead the animals to the magical house in a Ukrainian glove.
 Icon=rukavychka
 Terminal=false
 Categories=Game;ArcadeGame;
+X-Purism-FormFactor=Workstation;Mobile;

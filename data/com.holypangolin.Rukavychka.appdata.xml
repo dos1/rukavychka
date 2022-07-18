@@ -8,22 +8,42 @@
   <summary>Lead the animals to the magical house in a Ukrainian glove.</summary>
 
   <description>
-    <p>
-			A game inspired by Ukrainian legend of Rukavychka (glove) - in which an old man lost a glove, which came to be a home for many forest animals big and small: from a little mouse to a huge bear. In the story, the old man takes the glove back, but we imagine a story where the animals can live safely in the magical home. They are lost and we have to lead them to it by a fox from the Ukrainian story, and Wawel Dragon from Polish legends, to unify our nations by social cooperation, and unfold/bring safe future for everyone (including forest beings that also need peace to exist). We developed the first level, in which you lead a little mouse to magical rukavychka.</p>
+    <p>A game inspired by Ukrainian legend of Rukavychka (glove) - in which an old man lost a glove, which came to be a home for many forest animals big and small: from a little mouse to a huge bear. In the story, the old man takes the glove back, but we imagine a story where the animals can live safely in the magical home. They are lost and we have to lead them to it by a fox from the Ukrainian story, and Wawel Dragon from Polish legends, to unify our nations by social cooperation, and unfold/bring safe future for everyone (including forest beings that also need peace to exist). We developed the first level, in which you lead a little mouse to magical rukavychka.</p>
 
-		<p>We were inspired by traditional floral patterns for the backgrounds (made by watercolors and ink). We also focused on colors from Ukrainian flag (yellow and blue shades, with a bit of green for the leaves) and important Ukrainian flowers like sunflower or Vinca species.</p>
+    <p>We were inspired by traditional floral patterns for the backgrounds (made by watercolors and ink). We also focused on colors from Ukrainian flag (yellow and blue shades, with a bit of green for the leaves) and important Ukrainian flowers like sunflower or Vinca species.</p>
 
-		<p>Controls are WSAD for the Ukrainian fox and ARROWS for the Polish dragon.</p>
-		<p>OBJECTIVE: First, find the mouse (dragon) and the door to Rukavychka (fox) together, then lead the mouse there - it can walk only on the plants within the fox or the dragon and will stop in front of gaps. The dragon and the fox are in 2 different worlds, but in the end everyone will be joined together.</p>
+    <p>Controls are WSAD for the Ukrainian fox and ARROWS for the Polish dragon.</p>
+    <p>OBJECTIVE: First, find the mouse (dragon) and the door to Rukavychka (fox) together, then lead the mouse there - it can walk only on the plants within the fox or the dragon and will stop in front of gaps. The dragon and the fox are in 2 different worlds, but in the end everyone will be joined together.</p>
 
-		<p>Game made by Agata Nawrot and Sebastian Krzyszkowiak for United with Ukraine Game Jam 2022. All assets made by ourselves.</p>
+    <p>Game made by Agata Nawrot and Sebastian Krzyszkowiak for United with Ukraine Game Jam 2022. All assets made by ourselves.</p>
   </description>
+
+  <url type="homepage">https://holypangolin.com/</url>
 
   <launchable type="desktop-id">rukavychka.desktop</launchable>
 
   <developer_name>Holy Pangolin</developer_name>
 
   <update_contact>dos_AT_dosowisko.net</update_contact>
+
+  <custom>
+    <value key="Purism::form_factor">workstation</value>
+    <value key="Purism::form_factor">mobile</value>
+  </custom>
+
+  <recommends>
+    <display_length compare="ge">640</display_length>
+  </recommends>
+
+  <requires>
+    <display_length compare="gt">xsmall</display_length>
+  </requires>
+
+  <supports>
+    <control>keyboard</control>
+    <control>touch</control>
+    <control>gamepad</control>
+  </supports>
 
   <provides>
     <binary>rukavychka</binary>
