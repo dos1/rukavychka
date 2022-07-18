@@ -59,5 +59,11 @@ int main(int argc, char** argv) {
 
 	game->data = CreateGameData(game);
 
+#ifdef __EMSCRIPTEN__
+	EM_ASM({
+		document.getElementById('loading').style.display = 'none';
+	});
+#endif
+
 	return libsuperderpy_run(game);
 }

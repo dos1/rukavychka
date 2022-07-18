@@ -86,7 +86,6 @@
       }
       .loading-bar-bg {
         opacity: 0.25;
-        filter: contrast(150%) brightness(150%);
       }
       .loading-bar {
         width: 529px;
@@ -170,6 +169,7 @@
           err.classList.add('error');
           err.innerHTML = '<p>'+text+'</p><p>Please refresh the page.</p>';
           document.getElementById('wrapper').appendChild(err);
+          Module.adjustSize();
         },
         drawProgress: function(progress) {
           document.getElementById('loading-bar').style.width = ~~(progress * 529) + 'px';
@@ -195,7 +195,6 @@
             console.log('***** ***');
           }
           console.info(text);
-          if (text == "Running...")  document.getElementById('loading').style.display = 'none';
         },
         totalDependencies: 0,
         monitorRunDependencies: function(left) {
@@ -222,7 +221,7 @@
       Module.drawProgress(0);
 
       window.onresize = Module.adjustSize;
-      Module.adjustSize();
+      setTimeout(Module.adjustSize, 0);
 
       window.onerror = function() {
         Module.setStatus('Exception thrown, see JavaScript console');
