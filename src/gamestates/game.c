@@ -378,6 +378,13 @@ void Gamestate_ProcessEvent(struct Game* game, struct GamestateResources* data, 
 		data->show2 = true;
 	}
 
+#ifdef ALLEGRO_ANDROID
+	// don't try to handle accelerometer data on Android
+	if (ev->type == ALLEGRO_EVENT_JOYSTICK_AXIS) {
+		return;
+	}
+#endif
+
 #ifdef ALLEGRO_WITH_XWINDOWS
 	if (ev->type == ALLEGRO_EVENT_JOYSTICK_AXIS && (ev->joystick.stick == 0 || ev->joystick.stick == 3)) {
 #else
