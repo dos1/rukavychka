@@ -81,17 +81,17 @@
       }
       .loading-bar-bg, .loading-bar {
         position: absolute;
-        top: calc(50% - 24px);
-        left: calc(50% - 176px);
+        top: calc(50% - 60.5px);
+        left: calc(50% - 264.5px);
       }
       .loading-bar-bg {
         opacity: 0.25;
         filter: contrast(150%) brightness(150%);
       }
       .loading-bar {
-        width: 353px;
-        height: 49px;
-        background-color: black;
+        width: 529px;
+        height: 121px;
+        background-image: url('pasek_ladowania.png');
       }
       .blocker {
         position: absolute;
@@ -113,7 +113,9 @@
       <canvas class="emscripten" id="canvas" width="1920" height="1080"></canvas>
       <div class="blocker"></div>
       <div id="loading" class="loading">
+        <img src="tlo_na_bialym.jpg" width="1920" height="1080" style="width: 100%; height: 100%; position: absolute" />
         <div class="loading-bar-wrapper">
+          <img src="pasek_ladowania.png" class="loading-bar-bg" />
           <div class="loading-bar" id="loading-bar" style="width: 0px"></div>
         </div>
       </div>
@@ -170,7 +172,7 @@
           document.getElementById('wrapper').appendChild(err);
         },
         drawProgress: function(progress) {
-          document.getElementById('loading-bar').style.width = ~~(progress * 353) + 'px';
+          document.getElementById('loading-bar').style.width = ~~(progress * 529) + 'px';
         },
         setStatus: function(text) {
           if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
@@ -206,7 +208,6 @@
           var y = (window.innerHeight - 1080 * scale) / 2;
           document.querySelector('body').style = 'padding-left: ' + x + 'px; padding-top: ' + y + 'px;';
           var wrapper = document.getElementById('wrapper');
-          console.log(wrapper);
           Array.prototype.forEach.apply(wrapper.children, [function(elem) {
             if (scale != 1.0) {
               elem.style.transform = 'scale(' + scale + ')';

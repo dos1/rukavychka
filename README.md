@@ -1,4 +1,4 @@
-# Rukavychka
+# Rukavychka (Рукавичка)
 
 ![Wawel Dragon](data/smok.gif)
 
