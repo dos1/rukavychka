@@ -11,7 +11,8 @@
    "--socket=wayland",
    "--socket=pulseaudio",
    "--device=dri",
-   "--share=ipc"
+   "--share=ipc",
+   "--env=SDL_MOUSE_AUTO_CAPTURE=0"
 ],
 "cleanup": ["/include", "/lib/pkgconfig", "/lib/*.a", "/lib/*.la", "/share/aclocal", "/share/doc", "/bin/test_physfs"],
 "modules": [
