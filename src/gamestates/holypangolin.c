@@ -40,7 +40,7 @@ int Gamestate_ProgressCount = 1;
 void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double delta) {
 	data->counter += delta * 60;
 	if (data->counter > 60 * 6) {
-		SwitchCurrentGamestate(game, NEXT_GAMESTATE);
+		ChangeCurrentGamestate(game, NEXT_GAMESTATE);
 	}
 }
 
@@ -82,7 +82,7 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 
 void Gamestate_ProcessEvent(struct Game* game, struct GamestateResources* data, ALLEGRO_EVENT* ev) {
 	if (((ev->type == ALLEGRO_EVENT_KEY_DOWN) && (ev->keyboard.keycode == ALLEGRO_KEY_ESCAPE)) || (ev->type == ALLEGRO_EVENT_TOUCH_END)) {
-		SwitchCurrentGamestate(game, SKIP_GAMESTATE);
+		ChangeCurrentGamestate(game, SKIP_GAMESTATE);
 	}
 }
 
