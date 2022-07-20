@@ -30,6 +30,11 @@ static _Noreturn void derp(int sig) {
 }
 
 int main(int argc, char** argv) {
+
+#ifdef __vita__
+	scePowerSetGpuClockFrequency(222);
+#endif
+
 	signal(SIGSEGV, derp);
 
 	srand(time(NULL));
