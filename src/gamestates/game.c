@@ -51,6 +51,11 @@ struct GamestateResources {
 int Gamestate_ProgressCount = 18;
 
 void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double delta) {
+	int orig_lx = GetCharacterX(game, data->lisek);
+	int orig_ly = GetCharacterY(game, data->lisek);
+	int orig_sx = GetCharacterX(game, data->smok);
+	int orig_sy = GetCharacterY(game, data->smok);
+
 	if (data->won) {
 		data->woncount -= delta;
 		if (data->woncount < 0.0) {
@@ -193,7 +198,7 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 				}
 			}
 
-			if (connected && Distance(mx, my, lx, ly) <= MAX_DISTANCE) {
+			if (connected && Distance(mx, my, orig_lx, orig_ly) <= MAX_DISTANCE) {
 				if (mx != lx) {
 					data->myszka->flipX = mx < lx;
 				}
@@ -232,7 +237,7 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 				}
 			}
 
-			if (connected && Distance(mx, my, sx, sy) <= MAX_DISTANCE) {
+			if (connected && Distance(mx, my, orig_sx, orig_sy) <= MAX_DISTANCE) {
 				if (mx != sx) {
 					data->myszka->flipX = mx < sx;
 				}
