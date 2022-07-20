@@ -55,7 +55,7 @@ void PostDraw(struct Game* game) {
 		game->data->lasttime = al_get_time();
 	}
 
-#if !defined(POCKETCHIP) && !defined(MAEMO5)
+#if !defined(POCKETCHIP) && !defined(MAEMO5) && !defined(__vita__) && !defined(RASPBERRYPI)
 	al_use_shader(game->data->shader);
 	al_set_clipping_rectangle(game->clip_rect.x - game->clip_rect.w * 0.0625, game->clip_rect.y - game->clip_rect.h * 0.05555, game->clip_rect.w * 1.125, game->clip_rect.h * 1.1111);
 	al_draw_scaled_bitmap(game->data->tex, 0, 0, al_get_bitmap_width(game->data->tex), al_get_bitmap_height(game->data->tex),
@@ -75,7 +75,7 @@ void PostDraw(struct Game* game) {
 
 struct CommonResources* CreateGameData(struct Game* game) {
 	struct CommonResources* data = calloc(1, sizeof(struct CommonResources));
-#if !defined(POCKETCHIP) && !defined(MAEMO5)
+#if !defined(POCKETCHIP) && !defined(MAEMO5) && !defined(__vita__) && !defined(RASPBERRYPI)
 	data->tex = al_load_bitmap(GetDataFilePath(game, "tex.jpg"));
 	data->shader = CreateShader(game, GetDataFilePath(game, "shaders/vertex.glsl"), GetDataFilePath(game, "shaders/alpha.glsl"));
 #endif
@@ -90,7 +90,7 @@ struct CommonResources* CreateGameData(struct Game* game) {
 }
 
 void DestroyGameData(struct Game* game) {
-#if !defined(POCKETCHIP) && !defined(MAEMO5)
+#if !defined(POCKETCHIP) && !defined(MAEMO5) && !defined(__vita__) && !defined(RASPBERRYPI)
 	al_destroy_bitmap(game->data->tex);
 	DestroyShader(game, game->data->shader);
 #endif
