@@ -21,7 +21,7 @@
 #include "../common.h"
 #include <libsuperderpy.h>
 
-#define MAX_DISTANCE 80
+#define MAX_DISTANCE 100
 #define TOUCH_DISTANCE 160
 
 struct GamestateResources {
