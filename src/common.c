@@ -40,7 +40,7 @@ void PreLogic(struct Game* game, double delta) {
 		if (al_get_sample_instance_gain(game->data->sample_instance) == 0.00) {
 			SetBackgroundColor(game, al_map_rgb(0, 0, 0));
 			al_rest(1.0);
-			QuitGame(game, false);
+			UnloadAllGamestates(game);
 		}
 		al_set_sample_instance_gain(game->data->sample_instance, fmax(0.00, al_get_sample_instance_gain(game->data->sample_instance) - delta / 16.0));
 	} else {

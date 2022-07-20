@@ -58,7 +58,8 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 
 	if (data->won) {
 		data->woncount -= delta;
-		if (data->woncount < 0.0) {
+		if (data->woncount < 0.0 && !game->data->won) {
+			PrintConsole(game, "Fade out...");
 			game->data->won = true;
 		}
 	}
