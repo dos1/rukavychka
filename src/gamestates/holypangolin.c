@@ -46,8 +46,7 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 
 #ifdef __vita__
 void Gamestate_PreDraw(struct Game* game, struct GamestateResources* data) {
-	double a = pow(sin(data->counter / (15 * 7.5)), 0.9);
-	if (data->counter / (15 * 7.5) >= ALLEGRO_PI) return;
+	double a = fmax(0, pow(sin(data->counter / (15 * 7.5)), 0.9));
 	al_set_target_bitmap(data->vita);
 	ClearToColor(game, al_map_rgba(0, 0, 0, 0));
 	al_draw_tinted_scaled_bitmap(data->bg, al_map_rgba_f(1.0, 1.0, 1.0, a), 0, 0, al_get_bitmap_width(data->bmp), al_get_bitmap_height(data->bmp), game->viewport.width * 0.165 + (game->viewport.width - (game->viewport.height * 0.66)) / 4.0, game->viewport.height * 0.165, game->viewport.height * 0.66, game->viewport.height * 0.66, 0);
@@ -75,7 +74,7 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	al_set_shader_float("brightness", 1.0);
 	al_set_shader_float("saturation", 1.2);
 
-	double pos = pow(sin(data->counter / (15 * 7.5)), 0.9);
+	double pos = fmax(0, pow(sin(data->counter / (15 * 7.5)), 0.9));
 	al_draw_tinted_scaled_bitmap(data->bmp, al_map_rgba_f(pos, pos, pos, pos), 0, 0, al_get_bitmap_width(data->bmp), al_get_bitmap_height(data->bmp), game->viewport.width * 0.165 + (game->viewport.width - (game->viewport.height * 0.66)) / 4.0, game->viewport.height * 0.165, game->viewport.height * 0.66, game->viewport.height * 0.66, 0);
 
 	al_use_shader(NULL);
