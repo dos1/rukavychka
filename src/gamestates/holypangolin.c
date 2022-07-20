@@ -44,8 +44,8 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 	}
 }
 
-void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 #ifdef __vita__
+void Gamestate_PreDraw(struct Game* game, struct GamestateResources* data) {
 	double a = pow(sin(data->counter / (15 * 7.5)), 0.9);
 	if (data->counter / (15 * 7.5) >= ALLEGRO_PI) return;
 	al_set_target_bitmap(data->vita);
@@ -54,8 +54,11 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 	al_set_separate_blender(ALLEGRO_ADD, ALLEGRO_ZERO, ALLEGRO_ONE,
 		ALLEGRO_ADD, ALLEGRO_ZERO, ALLEGRO_ALPHA);
 	al_draw_scaled_bitmap(data->bmp, 0, 0, al_get_bitmap_width(data->bmp), al_get_bitmap_height(data->bmp), game->viewport.width * 0.165 + (game->viewport.width - (game->viewport.height * 0.66)) / 4.0, game->viewport.height * 0.165, game->viewport.height * 0.66, game->viewport.height * 0.66, 0);
-	SetFramebufferAsTarget(game);
-	ClearToColor(game, al_map_rgba(255, 255, 255, 255));
+}
+#endif
+
+void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
+#ifdef __vita__
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA);
 	al_draw_bitmap(data->vita, 0, 0, 0);
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA);
