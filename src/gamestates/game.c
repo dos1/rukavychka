@@ -277,6 +277,7 @@ void Gamestate_PreDraw(struct Game* game, struct GamestateResources* data) {
 		PushTransform(game, &transform);
 		DrawCharacter(game, data->myszka);
 		PopTransform(game);
+		al_reset_clipping_rectangle();
 	}
 
 #ifdef __vita__
