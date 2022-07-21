@@ -268,6 +268,11 @@ void Gamestate_PreDraw(struct Game* game, struct GamestateResources* data) {
 	if (!data->found) {
 		al_set_target_bitmap(data->bg_anim2);
 		al_clear_to_color(al_map_rgba(255, 255, 255, 255));
+		al_set_clipping_rectangle(
+			(data->smok->x - 0.18) * al_get_bitmap_width(data->bg_anim2),
+			(data->smok->y - 0.25) * al_get_bitmap_height(data->bg_anim2),
+			0.36 * al_get_bitmap_width(data->bg_anim2),
+			0.4 * al_get_bitmap_height(data->bg_anim2));
 		al_draw_bitmap(data->bg2, 0, 0, 0);
 		PushTransform(game, &transform);
 		DrawCharacter(game, data->myszka);
