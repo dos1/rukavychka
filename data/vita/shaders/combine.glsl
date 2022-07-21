@@ -26,7 +26,6 @@ float4 main(
   float4 varying_pos : TEXCOORD1)
 {
 	float4 color = float4(1.0) - tex2D(al_tex, varying_texcoord);
-	return tex2D(tex, (varying_pos.xy / scale + 1.0) / 2.0 - offset * float2(1.0, -1.0));
 	float4 tex_color = tex2D(tex, (varying_pos.xy / scale + 1.0) / 2.0 - offset * float2(1.0, -1.0));
 	float3 sat = convertRgbToHsl(tex_color.rgb * color.a);
 	sat.y *= saturation;

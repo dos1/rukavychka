@@ -261,11 +261,17 @@ void Gamestate_Logic(struct Game* game, struct GamestateResources* data, double 
 }
 
 void Gamestate_PreDraw(struct Game* game, struct GamestateResources* data) {
+	ALLEGRO_TRANSFORM transform;
+	al_identity_transform(&transform);
+	al_scale_transform(&transform, al_get_bitmap_width(data->bg_anim2) / 1920.0, al_get_bitmap_height(data->bg_anim2) / 1080.0);
+
 	if (!data->found) {
 		al_set_target_bitmap(data->bg_anim2);
 		al_clear_to_color(al_map_rgba(255, 255, 255, 255));
 		al_draw_bitmap(data->bg2, 0, 0, 0);
+		PushTransform(game, &transform);
 		DrawCharacter(game, data->myszka);
+		PopTransform(game);
 	}
 
 #ifdef __vita__
@@ -276,7 +282,9 @@ void Gamestate_PreDraw(struct Game* game, struct GamestateResources* data) {
 	al_draw_tinted_bitmap(data->bg, al_map_rgba_f(0.94, 0.94, 0.94, 1.0), 0, 0, 0);
 	al_set_separate_blender(ALLEGRO_ADD, ALLEGRO_ZERO, ALLEGRO_ONE,
 		ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+	PushTransform(game, &transform);
 	DrawCharacter(game, data->lisek);
+	PopTransform(game);
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA);
 
 	al_set_target_bitmap(data->bg_vita2);
@@ -286,7 +294,9 @@ void Gamestate_PreDraw(struct Game* game, struct GamestateResources* data) {
 	al_draw_tinted_bitmap(data->found ? data->bg2 : data->bg_anim2, al_map_rgba_f(0.94, 0.94, 0.94, 1.0), 0, 0, 0);
 	al_set_separate_blender(ALLEGRO_ADD, ALLEGRO_ZERO, ALLEGRO_ONE,
 		ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+	PushTransform(game, &transform);
 	DrawCharacter(game, data->smok);
+	PopTransform(game);
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA);
 
 	if (data->won) {
@@ -297,7 +307,9 @@ void Gamestate_PreDraw(struct Game* game, struct GamestateResources* data) {
 		al_draw_bitmap(data->koniec, 0, 0, 0);
 		al_set_separate_blender(ALLEGRO_ADD, ALLEGRO_ZERO, ALLEGRO_ONE,
 			ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+		PushTransform(game, &transform);
 		DrawCharacter(game, data->transition);
+		PopTransform(game);
 		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA);
 	}
 #endif
@@ -306,10 +318,10 @@ void Gamestate_PreDraw(struct Game* game, struct GamestateResources* data) {
 void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 #ifdef __vita__
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA);
-	al_draw_bitmap(data->bg_vita1, 0, 0, 0);
-	al_draw_bitmap(data->bg_vita2, 0, 0, 0);
+	DrawFullscreen(data->bg_vita1, 0);
+	DrawFullscreen(data->bg_vita2, 0);
 	if (data->won) {
-		al_draw_bitmap(data->bg_vita3, 0, 0, 0);
+		DrawFullscreen(data->bg_vita3, 0);
 	}
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA);
 	if (data->found && !data->won) {
@@ -323,6 +335,10 @@ void Gamestate_Draw(struct Game* game, struct GamestateResources* data) {
 		sin(al_get_time() / 2.0) * 4.0 / 1920.0,
 		cos(al_get_time() / 2.9) * 3.0 / 1080.0,
 	};
+
+#if defined(MAEMO5) || defined(POCKETCHIP)
+	offset[0] = offset[1] = 0;
+#endif
 
 	al_use_shader(data->shader);
 	al_set_shader_sampler("tex", data->bg, 1);
@@ -635,7 +651,7 @@ void* Gamestate_Load(struct Game* game, void (*progress)(struct Game*)) {
 #ifdef __vita__
 	data->bg_vita1 = CreateNotPreservedBitmap(al_get_bitmap_width(data->bg), al_get_bitmap_height(data->bg));
 	data->bg_vita2 = CreateNotPreservedBitmap(al_get_bitmap_width(data->bg2), al_get_bitmap_height(data->bg2));
-	data->bg_vita3 = CreateNotPreservedBitmap(al_get_bitmap_width(data->bg), al_get_bitmap_height(data->bg));
+	data->bg_vita3 = CreateNotPreservedBitmap(al_get_bitmap_width(data->koniec), al_get_bitmap_height(data->koniec));
 #endif
 
 	return data;
