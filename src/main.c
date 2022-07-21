@@ -30,7 +30,6 @@ static _Noreturn void derp(int sig) {
 }
 
 int main(int argc, char** argv) {
-
 #ifdef __vita__
 	scePowerSetGpuClockFrequency(222);
 #endif
@@ -53,10 +52,9 @@ int main(int argc, char** argv) {
 				.postdraw = PostDraw,
 			},
 			.show_loading_on_launch = true,
+			.bg_color = al_map_rgb(255, 255, 255),
 		});
 	if (!game) { return 1; }
-
-	SetBackgroundColor(game, al_map_rgb(255, 255, 255));
 
 	LoadGamestate(game, "holypangolin");
 	LoadGamestate(game, "game");
