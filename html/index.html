@@ -205,7 +205,8 @@
           var scale = Math.min(window.innerWidth/1920.0, window.innerHeight/1080.0);
           var x = (window.innerWidth - 1920 * scale) / 2;
           var y = (window.innerHeight - 1080 * scale) / 2;
-          document.querySelector('body').style = 'padding-left: ' + x + 'px; padding-top: ' + y + 'px;';
+          document.body.style.paddingLeft = x + 'px';
+          document.body.style.paddingTop = y + 'px';
           var wrapper = document.getElementById('wrapper');
           Array.prototype.forEach.apply(wrapper.children, [function(elem) {
             if (scale != 1.0) {
